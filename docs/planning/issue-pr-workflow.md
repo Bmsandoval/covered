@@ -46,8 +46,24 @@ flowchart TB
 
 - Create the **parent first**, then sub-issues; link sub-issues to the parent using GitHub **sub-issues** (Issues → parent → add sub-issue).
 - Agents implement **sub-issues only** — one sub-issue per branch/PR.
+- **Link every working branch** on the sub-issue (**Development** sidebar) before or right after the first push.
 - PRs **`Closes #N`** the **sub-issue** number.
 - Close the **parent** only after: all sub-issues closed, joint test on `develop`, merge to `main`, git tag pushed, tag recorded on parent.
+
+### Link branch to sub-issue (Development section)
+
+GitHub only shows work on the issue when the branch (and/or PR) is linked under **Development**.
+
+**Create linked branch (recommended):**
+
+```bash
+git checkout develop && git pull
+gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --checkout --base develop
+```
+
+**Branch already pushed but not linked:** On the sub-issue → **Development** → **Link a branch** → select e.g. `issue-3-planning-docs`.
+
+**Verify:** Issue sidebar **Development** lists the branch; after PR open, the PR should appear (branch may be folded into PR — OK).
 
 **Labels (suggested):** parent — `release`, `v0.1.0`; sub-issues — `stage:1`, etc. if useful.
 
@@ -248,11 +264,17 @@ Do **not** include “Made with Cursor”, “AI-generated”, Copilot/Claude co
 - [ ] Sub-issues created and attached to parent in GitHub
 - [ ] Parent body lists all sub-issue numbers
 
+**When starting work (sub-issue)**
+
+- [ ] Branch created with `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop`, **or** existing branch linked via **Development → Link a branch**
+- [ ] Branch visible on sub-issue **Development** before or immediately after first push
+
 **When opening a PR (sub-issue)**
 
 - [ ] PR targets **sub-issue** with `Closes #N`
 - [ ] Body includes full sub-issue URL under **Issue**
 - [ ] Comment on **sub-issue** with PR link (backlink)
+- [ ] PR appears under **Development** on the sub-issue
 - [ ] Optional: comment on **parent** with progress note when a major sub-issue merges
 
 **When releasing**

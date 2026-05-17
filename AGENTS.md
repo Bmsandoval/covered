@@ -257,7 +257,30 @@ Templates: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workf
 
 - **Branch name:** `issue-<number>-<very-short-description>` (e.g. `issue-3-planning-docs`).
 - **PR title:** `Issue-<number> - <slightly longer description>` (e.g. `Issue-3 - Add planning documents and workflow`).
+- **Link the branch on the sub-issue** so it appears under **Development** (see below).
 - Open PRs **into `develop`**, never into `main`, unless explicitly instructed for a release promotion PR.
+
+### Link branches in the issue Development section (required)
+
+GitHub’s issue **Development** sidebar must show the working branch (and then the PR). **Every sub-issue** you implement must have its branch linked there.
+
+**Preferred — create a linked branch (maintainer machine with `gh auth login`):**
+
+```bash
+git checkout develop && git pull
+gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --checkout --base develop
+```
+
+This creates the branch **already linked** to the issue.
+
+**If the branch already exists locally and was pushed:**
+
+1. On the sub-issue: **Development** → **Link a branch** → choose the remote branch (e.g. `issue-3-planning-docs`), **or**
+2. After `gh auth login`, recreate via `gh issue develop` with `--name` matching the existing branch (only if not linked yet).
+
+**After opening a PR:** `Closes #N` links the PR in Development; the branch may be hidden once the PR is open — that is normal. If neither branch nor PR appears, fix linking before merge.
+
+**Agents:** If you cannot run `gh issue develop` (no auth / API scope), **comment on the sub-issue** with the exact branch name and remind the maintainer to use **Development → Link a branch**, or to run `gh issue develop` locally.
 - **Minor releases:** merge `develop` → `main` only after we have tested the release batch together on `develop`.
 - **Tag** each release commit on `main` (e.g. `v0.2.0`) and record that tag on the related issue(s).
 
@@ -345,6 +368,7 @@ Before coding:
 
 Before opening a PR:
 
+- [ ] Branch appears under the sub-issue **Development** section (via `gh issue develop` or manual link)
 - [ ] Changes map only to that issue
 - [ ] PR targets `develop`
 - [ ] PR body follows the format above with `Closes #N` and issue URL
