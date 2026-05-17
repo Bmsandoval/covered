@@ -51,7 +51,7 @@ Only after an **active sub-issue** is agreed:
 
 1. `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (before first commit)
 2. Implement **only** that sub-issue’s acceptance criteria
-3. Open PR to `develop` with `Implements https://github.com/Bmsandoval/covered/issues/<N>` (see **Development workflow**)
+3. Open PR to `develop` with `Resolves bmsandoval/covered#<N> (https://github.com/Bmsandoval/covered/issues/<N>)` (see **Development workflow**)
 4. After merge: pick the next sub-issue or return to planning if the release batch needs more breakdown
 
 ### New session quick start
@@ -283,7 +283,7 @@ Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All 
 2. Create **sub-issues** for each part; attach them as **sub-issues** of the parent in GitHub.
 3. Prioritize and implement **sub-issues only** — one at a time.
 4. **Bug fixes** found during testing → always a **new sub-issue** under the same parent (never bundled into an unrelated sub-issue PR).
-5. PRs to `develop` use **`Implements`** with the **sub-issue** full URL only (see below) — squash-merge closes the sub-issue.
+5. PRs to `develop` use **`Resolves`** with the **sub-issue** shorthand plus full URL in parentheses (see below) — squash-merge closes the sub-issue.
 6. When all sub-issues are closed and the release batch is tested on `develop`, **cut a release branch**, tag (e.g. `v0.1.0`), **close the parent** when release criteria are met.
 
 Do not file flat issues for release work without a parent when that work belongs to a planned minor version.
@@ -409,13 +409,13 @@ GitHub’s **Development** sidebar on the **sub-issue** (not the parent release 
 **On every PR to `develop` — first line (sub-issue only):**
 
 ```text
-Implements https://github.com/Bmsandoval/covered/issues/<sub-issue-number>
+Resolves bmsandoval/covered#<sub-issue-number> (https://github.com/Bmsandoval/covered/issues/<sub-issue-number>)
 ```
 
 Example (sub-issue #3):
 
 ```text
-Implements https://github.com/Bmsandoval/covered/issues/3
+Resolves bmsandoval/covered#3 (https://github.com/Bmsandoval/covered/issues/3)
 ```
 
 - **Sub-issue** — the slice you implemented (branch `issue-<sub>-…`, Development panel shows branch/PR).
@@ -423,7 +423,7 @@ Implements https://github.com/Bmsandoval/covered/issues/3
 
 Then Summary, Changes, and Test plan (see template). Do **not** add an **Issues** section — Development on the sub-issue is enough.
 
-**Hotfix PRs** (into `release-*`, not `develop`): `Implements` only the **bug-fix sub-issue** URL unless the maintainer says otherwise.
+**Hotfix PRs** (into `release-*`, not `develop`): `Resolves` only the **bug-fix sub-issue** (same shorthand + URL format) unless the maintainer says otherwise.
 
 **On every completed release (after all subs merged to `develop`):**
 
@@ -438,7 +438,7 @@ Keep PR descriptions **short but descriptive**:
 3. **Changes (required)** — Bullet list of concrete changes (what shipped).
 4. **Test plan** — Checklist for how it was or should be verified.
 
-The **first line** must be `Implements https://github.com/Bmsandoval/covered/issues/<N>`. Do not add a separate Issues section — GitHub **Development** links the PR on the sub-issue.
+The **first line** must be `Resolves bmsandoval/covered#<N> (https://github.com/Bmsandoval/covered/issues/<N>)`. Do not add a separate Issues section — GitHub **Development** links the PR on the sub-issue.
 
 Do not write novel-length PR bodies.
 
@@ -465,7 +465,7 @@ Write issues and PRs as **normal engineering artifacts**: problem, approach, cha
 **PR body skeleton:**
 
 ```markdown
-Implements https://github.com/Bmsandoval/covered/issues/<sub>
+Resolves bmsandoval/covered#<sub> (https://github.com/Bmsandoval/covered/issues/<sub>)
 
 ## Summary
 
@@ -513,7 +513,7 @@ Before opening a PR:
 - [ ] Branch appears under the sub-issue **Development** section (via `gh issue develop` or manual link)
 - [ ] Changes map only to that issue
 - [ ] PR targets `develop`
-- [ ] First line: `Implements https://github.com/Bmsandoval/covered/issues/<sub>`
+- [ ] First line: `Resolves bmsandoval/covered#<sub> (https://github.com/Bmsandoval/covered/issues/<sub>)`
 - [ ] PR body has **no** Cursor / “Made with” footer (`gh pr view` to verify)
 - [ ] PR has same **milestone** as sub-issue and matching **labels** (`gh pr edit …`)
 - [ ] Issue commented with PR link
