@@ -111,15 +111,23 @@ gh pr edit <pr> --milestone "v0.0.0" --add-label "documentation,planning"
 
 ### Link branch and PR (Development section)
 
-**Before the first commit** (required):
+**Before feature commits** (required):
 
 ```bash
 git checkout develop && git pull
 gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --checkout --base develop
-# commit, push, then open PR
+git commit --allow-empty -m "Start issue-<issue-number>-<short-slug>"
+git push -u origin HEAD
+# implement, commit, push, open PR
 ```
 
-**Branch already on remote without link:** sub-issue → **Development** → **Link a branch** → `issue-<N>-<slug>`. Do not use GraphQL `createLinkedBranch` (wrong branch name).
+The **empty commit** is optional but recommended when you need the linked remote branch and Development panel set up **before** real work.
+
+**Auto-named branches:** Do not use GraphQL `createLinkedBranch`. GitHub may create `3-add-…` from the issue title — that branch is **not** yours. After squash-merge to `develop`, delete it; do not merge it (it only looks “ahead” with obsolete commits).
+
+**Branch already on remote without link:** sub-issue → **Development** → **Link a branch** → `issue-<N>-<slug>`.
+
+**After PR merge:** delete stale `issue-<N>-*` and any mistaken `N-add-…` remote branches.
 
 **PR first line (required):**
 
@@ -129,7 +137,7 @@ gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --check
 
 Must be a **list item** (`-` prefix) so GitHub **unfurls** the issue (title + state) and applies the closing keyword on squash-merge. No full issue URL or extra `- #<sub>` line.
 
-Squash-merge to `develop` closes the **sub-issue**. The **parent** is tracked via GitHub **sub-issue** relationships and closed manually when the release ships. Link branch/PR on the **sub-issue** Development panel (no parent/PR/planning links needed in issue bodies).
+Squash-merge to `develop` closes the **sub-issue**. The **parent** is tracked via GitHub **sub-issue** relationships; GitHub may auto-close the parent when all subs close — still comment with tag/branch when releasing. Link branch/PR on the **sub-issue** Development panel (no parent/PR/planning links needed in issue bodies).
 
 **Parent release issues** do not get feature branches — only **sub-issues** do.
 
