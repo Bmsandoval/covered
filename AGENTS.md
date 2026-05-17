@@ -39,7 +39,7 @@ You are expected to **create, update, and organize issues** as work proceeds —
 | **Create sub-issues** | Each implementable slice, bug found in testing, or scope split |
 | **Edit issue bodies** | Acceptance criteria change; keep bodies minimal (no parent/PR/planning links in text — use sub-issues + Development) |
 | **Update parent checklist** | Check off sub-issues on the parent as they merge to `develop` |
-| **Close parent** | Manually when release criteria are met (tag cut, tested, all subs closed) |
+| **Close parent** | When release criteria are met (tag cut, tested, all subs closed). GitHub may **auto-close** the parent when all sub-issues close — still add a release comment with tag/branch. |
 
 Use the GitHub CLI (`gh issue create`, `gh issue edit`, milestones, labels) and follow **Labels and milestones** and **Issue hierarchy** below.
 
@@ -49,10 +49,11 @@ Use the GitHub CLI (`gh issue create`, `gh issue edit`, milestones, labels) and 
 
 Only after an **active sub-issue** is agreed:
 
-1. `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (before first commit)
-2. Implement **only** that sub-issue’s acceptance criteria
-3. Open PR to `develop` with `- Resolves bmsandoval/covered#<N>` as the first line (see **Development workflow**)
-4. After merge: pick the next sub-issue or return to planning if the release batch needs more breakdown
+1. `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (before the first **real** commit)
+2. Optional bootstrap: empty commit + push so Development and remote are set before feature work (see **Link branches**)
+3. Implement **only** that sub-issue’s acceptance criteria
+4. Open PR to `develop` with `- Resolves bmsandoval/covered#<N>` as the first line (see **Development workflow**)
+5. After merge: delete stale remote feature branches; pick the next sub-issue or return to planning
 
 ### New session quick start
 
@@ -387,14 +388,23 @@ Do not open feature PRs directly into `release-*` unless it is a hotfix for that
 
 GitHub’s **Development** sidebar on the **sub-issue** (not the parent release issue) must show the branch and/or PR.
 
-**Order matters — do not push an unlinked branch first.**
+**Order matters — use `issue-<N>-<slug>`, not GitHub’s auto names.**
 
 1. `git checkout develop && git pull`
-2. `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` — **before any commit**
-3. Commit, push, open PR
-4. Verify Development shows branch and/or PR (see below)
+2. `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` — **before** pushing feature commits
+3. Bootstrap the linked branch on the remote (recommended when you need Development set up **before** real changes):
 
-**Never** use GraphQL `createLinkedBranch` on an existing branch — GitHub creates a **new auto-named branch** (e.g. `3-add-planning-…`), not `issue-3-planning-docs`, and the real branch stays unlinked.
+```bash
+git commit --allow-empty -m "Start issue-<N>-<slug>"
+git push -u origin HEAD
+```
+
+4. Implement, commit, push, open PR
+5. Verify Development shows branch and/or PR
+
+**Why the empty commit:** `gh issue develop` must run before the branch exists on the remote with the wrong name. An immediate `--allow-empty` commit + push creates the correctly named remote branch and links it early — useful when planning tooling, CI, or “set things before we start.”
+
+**Never** use GraphQL `createLinkedBranch` on an existing branch — GitHub creates a **separate auto-named branch** from the issue title (e.g. `3-add-planning-documents-and-workflow-to-repository`). That branch is **not** your working branch. It will look “ahead of `develop`” with obsolete commits after you squash-merge the real PR — **delete it**; you do not need to merge it.
 
 **If the branch was already pushed without linking:**
 
@@ -402,7 +412,14 @@ GitHub’s **Development** sidebar on the **sub-issue** (not the parent release 
 
 `gh issue develop` cannot attach a branch that already exists on the remote (API error). Manual link or a new linked branch name is required.
 
-**Parent release issues (#2, etc.)** do not get branches — only **sub-issues** do.
+**After a PR merges:** delete stale remote branches for that issue (`issue-<N>-*`) and any auto-named `N-add-…` branch so `develop` comparisons stay clear:
+
+```bash
+git push origin --delete issue-<N>-<slug>   # if no longer needed
+git push origin --delete <auto-named-branch>  # if one was created by mistake
+```
+
+**Parent release issues** do not get branches — only **sub-issues** do.
 
 ### Issue ↔ PR linking (required)
 
@@ -421,7 +438,7 @@ Example (sub-issue #3):
 Use a **list item** (`-` prefix) so GitHub **unfurls** the issue (title + state) and the closing keyword still applies on squash-merge. Do not add a full issue URL or a separate `- #N` line.
 
 - **Sub-issue** — the slice you implemented (branch `issue-<sub>-…`, Development panel shows branch/PR).
-- **Parent** — linked as a **sub-issue** in GitHub; do **not** reference it in the PR body. Close the parent manually when the release ships.
+- **Parent** — linked as a **sub-issue** in GitHub; do **not** reference it in the PR body. Close or comment on the parent when the release ships (GitHub may auto-close the parent when all sub-issues close).
 
 Then Summary, Changes, and Test plan (see template). Do **not** add an **Issues** section — Development on the sub-issue is enough.
 
@@ -429,7 +446,17 @@ Then Summary, Changes, and Test plan (see template). Do **not** add an **Issues*
 
 **On every completed release (after all subs merged to `develop`):**
 
-- Cut `release-X-Y-Z`, tag, record the tag on the parent issue, and **close the parent** when release criteria are met.
+```bash
+git checkout develop && git pull
+git checkout -b release-X-Y-Z    # e.g. release-0-1-0 for v0.1.0
+git push -u origin release-X-Y-Z
+git tag -a vX.Y.Z -m "vX.Y.Z — <short release name>"
+git push origin vX.Y.Z
+gh release create vX.Y.Z --title "…" --notes "…"
+```
+
+- Comment on the **parent** issue with tag and release branch (check off release criteria).
+- **v0.0.0** dry run is complete (`release-0-0-0`, tag `v0.0.0`); next batch is **v0.1.0** (Insurance MVP).
 
 ### Pull request description format
 
@@ -508,6 +535,7 @@ When creating or drafting issues, use the structure in `docs/planning/issue-pr-w
 - [ ] Sub-issue has correct **milestone** (minor version) and **labels**
 - [ ] Note the **parent release issue** for context (do not implement the whole parent in one PR)
 - [ ] Create linked branch: `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop`
+- [ ] Optional: `git commit --allow-empty -m "Start issue-<N>-<slug>"` && `git push -u origin HEAD` (link Development before feature commits)
 - [ ] Sub-issue title is **user need**, not implementation; body has user story + acceptance criteria
 - [ ] Branch slug is technical (`issue-<N>-pdf-upload`); PR title is engineering (`Issue-<N> - Add PDF upload endpoint`)
 
@@ -521,12 +549,16 @@ Before opening a PR:
 - [ ] PR has same **milestone** as sub-issue and matching **labels** (`gh pr edit …`)
 - [ ] Issue commented with PR link
 
+After a PR merges:
+
+- [ ] Delete stale remote branches for that issue (`issue-<N>-*`, any `N-add-…` auto branch)
+
 Before considering a minor version “released”:
 
 - [ ] All sub-issues squash-merged to `develop`
 - [ ] Tested on `develop` with maintainer
 - [ ] `release-X-Y-Z` cut from `develop` and pushed
-- [ ] Tag (e.g. `v0.1.0`) on **release branch**; tag noted on parent issue
+- [ ] Tag (e.g. `v0.1.0`) on **release branch**; `gh release create` optional; tag noted on parent issue (comment)
 - [ ] Any release-branch hotfixes backmerged to `develop` (regular merge)
 
 ## Repository conventions

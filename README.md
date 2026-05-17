@@ -120,7 +120,9 @@ cp ex.env local.env
 
 ## Status
 
-Early stage — MVP (insurance documents + cited Q&A) in active planning and implementation. Post-MVP vault features are direction only until explicitly prioritized in issues.
+**v0.0.0** shipped (`release-0-0-0`, tag [`v0.0.0`](https://github.com/Bmsandoval/covered/releases/tag/v0.0.0)) — planning docs and contributor workflow on `develop`.
+
+**Next:** **v0.1.0** — Insurance MVP (Ask My Insurance Plan). Post-MVP vault features remain direction only until prioritized in issues.
 
 ## Disclaimer
 
