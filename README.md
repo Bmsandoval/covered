@@ -104,7 +104,7 @@ Agents **start in planning** — read `docs/planning/`, then **create and manage
 
 1. Each minor version has a **parent release issue** (milestone `v0.x.0`) and **sub-issues** for the parts — implement **one sub-issue** at a time.
 2. Before the first commit: `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (links branch on the issue).
-3. PR to `develop`, title `Issue-<sub> - <description>`, first line **`Resolves bmsandoval/covered#<sub> (https://github.com/Bmsandoval/covered/issues/<sub>)`** — **squash merge** (closes the sub-issue).
+3. PR to `develop`, title `Issue-<sub> - <description>`, first line **`- Resolves bmsandoval/covered#<sub>`** — **squash merge** (closes the sub-issue).
 4. Bug fixes → **new sub-issue** under the parent, not bundled into another PR.
 5. Test on `develop`; cut `release-0-1-0` from `develop`; tag on the release branch (e.g. `v0.1.0`).
 6. Hotfixes: branch from `release-*` → squash to release → **regular merge** back to `develop`.

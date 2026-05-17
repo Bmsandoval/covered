@@ -81,7 +81,7 @@ flowchart TB
 - Create the **parent first**, then sub-issues; link sub-issues to the parent using GitHub **sub-issues**.
 - Agents implement **sub-issues only** — one sub-issue per branch/PR.
 - **Link every working branch** on the sub-issue (**Development** sidebar).
-- PRs to `develop` **squash merge** with **`Resolves`** linking only the **sub-issue** (`bmsandoval/covered#<sub>` plus full URL in parentheses on the first line).
+- PRs to `develop` **squash merge** with **`- Resolves bmsandoval/covered#<sub>`** as the first line (list item — closes sub-issue and unfurls on GitHub).
 - **Bug fixes** during testing → **new sub-issue** under the parent (never drive-by on another branch).
 - After all subs on `develop`: cut `release-X-Y-Z`, tag, close parent when release criteria are met.
 
@@ -124,12 +124,10 @@ gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --check
 **PR first line (required):**
 
 ```text
-Resolves bmsandoval/covered#<sub> (https://github.com/Bmsandoval/covered/issues/<sub>)
-
-- #<sub>
+- Resolves bmsandoval/covered#<sub>
 ```
 
-Line 1 closes the sub-issue on squash-merge. Line 2 (`- #<sub>`) is a **list item** so GitHub **unfurls** the issue (title + state). Plain `#<sub>` outside a list only renders as a short link.
+Must be a **list item** (`-` prefix) so GitHub **unfurls** the issue (title + state) and applies the closing keyword on squash-merge. No full issue URL or extra `- #<sub>` line.
 
 Squash-merge to `develop` closes the **sub-issue**. The **parent** is tracked via GitHub **sub-issue** relationships and closed manually when the release ships. Link branch/PR on the **sub-issue** Development panel (no parent/PR/planning links needed in issue bodies).
 
@@ -211,9 +209,7 @@ Link the sub-issue to its parent in GitHub (**sub-issues** under the parent). Do
 **Merge:** **Squash** (features and hotfixes); **regular merge** for backmerge PRs only.
 
 ```markdown
-Resolves bmsandoval/covered#<sub> (https://github.com/Bmsandoval/covered/issues/<sub>)
-
-- #<sub>
+- Resolves bmsandoval/covered#<sub>
 
 ## Summary
 
@@ -255,7 +251,7 @@ Do **not** include “Made with Cursor”, “AI-generated”, or similar in iss
 
 - [ ] Base: **`develop`**
 - [ ] Merge method: **squash**
-- [ ] First line: `Resolves bmsandoval/covered#<sub> (https://github.com/Bmsandoval/covered/issues/<sub>)`
+- [ ] First line: `- Resolves bmsandoval/covered#<sub>`
 - [ ] No Cursor / “Made with” footer in PR body
 - [ ] Backlink on sub-issue; PR under **Development**
 - [ ] Milestone and labels on PR
