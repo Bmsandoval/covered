@@ -32,7 +32,7 @@ flowchart TB
 2. Test together on **`develop`**.
 3. Cut **`release-X-Y-Z`** from `develop` (e.g. `release-0-0-0`).
 4. Tag on the **release branch** (e.g. `v0.0.0`).
-5. Update parent issue with tag; close parent when done.
+5. Record tag on the parent issue; close the parent manually when release criteria are met.
 
 **v0.0.0 dry run:** squash-merge planning work to `develop` first; cut `release-0-0-0` later in the dry run.
 
@@ -81,9 +81,9 @@ flowchart TB
 - Create the **parent first**, then sub-issues; link sub-issues to the parent using GitHub **sub-issues**.
 - Agents implement **sub-issues only** — one sub-issue per branch/PR.
 - **Link every working branch** on the sub-issue (**Development** sidebar).
-- PRs to `develop` **squash merge** with `Resolves` for **sub-issue and parent** (work is tested when it lands on `develop`).
+- PRs to `develop` **squash merge** with **`Implements`** linking only the **sub-issue** (full issue URL on the first line).
 - **Bug fixes** during testing → **new sub-issue** under the parent (never drive-by on another branch).
-- After all subs on `develop`: cut `release-X-Y-Z`, tag, record tag on parent.
+- After all subs on `develop`: cut `release-X-Y-Z`, tag, close parent when release criteria are met.
 
 ### Labels and milestones (required)
 
@@ -124,10 +124,10 @@ gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --check
 **PR first line (required):**
 
 ```text
-Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>
+Implements https://github.com/Bmsandoval/covered/issues/<sub>
 ```
 
-Squash-merge to `develop` closes **both** — sub-issue (slice done) and parent release (tested on integration). Link branch/PR on the **sub-issue** Development panel.
+Squash-merge to `develop` closes the **sub-issue**. The **parent** is tracked via GitHub **sub-issue** relationships and closed manually when the release ships. Link branch/PR on the **sub-issue** Development panel (no parent/PR/planning links needed in issue bodies).
 
 **Parent release issues** do not get feature branches — only **sub-issues** do.
 
@@ -165,11 +165,6 @@ One paragraph: what this minor version delivers.
 ## Test plan (release batch)
 
 - [ ] …
-
-## Links
-
-- Planning: `docs/planning/staged-solution-plan.md`
-- Tag: _(fill after release)_
 ```
 
 ---
@@ -179,10 +174,6 @@ One paragraph: what this minor version delivers.
 **Title:** Short, imperative — e.g. `Add PDF upload endpoint`
 
 ```markdown
-## Parent release
-
-Part of **Release v0.1.0** — #<parent>
-
 ## Problem
 
 …
@@ -199,12 +190,9 @@ Part of **Release v0.1.0** — #<parent>
 ## Out of scope
 
 - …
-
-## Links
-
-- Parent: https://github.com/Bmsandoval/covered/issues/<parent>
-- PR: …
 ```
+
+Link the sub-issue to its parent in GitHub (**sub-issues** under the parent). Do not repeat parent/PR/planning links in the body — the **Development** panel shows the linked branch and PR.
 
 ---
 
@@ -219,7 +207,7 @@ Part of **Release v0.1.0** — #<parent>
 **Merge:** **Squash** (features and hotfixes); **regular merge** for backmerge PRs only.
 
 ```markdown
-Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>
+Implements https://github.com/Bmsandoval/covered/issues/<sub>
 
 ## Summary
 
@@ -234,11 +222,6 @@ Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>
 ## Test plan
 
 - [ ] …
-
-## Issues
-
-- Sub-issue: https://github.com/Bmsandoval/covered/issues/<sub>
-- Parent release: https://github.com/Bmsandoval/covered/issues/<parent>
 ```
 
 ---
@@ -266,7 +249,7 @@ Do **not** include “Made with Cursor”, “AI-generated”, or similar in iss
 
 - [ ] Base: **`develop`**
 - [ ] Merge method: **squash**
-- [ ] First line: `Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>`
+- [ ] First line: `Implements https://github.com/Bmsandoval/covered/issues/<sub>`
 - [ ] No Cursor / “Made with” footer in PR body
 - [ ] Backlink on sub-issue; PR under **Development**
 - [ ] Milestone and labels on PR
@@ -276,7 +259,7 @@ Do **not** include “Made with Cursor”, “AI-generated”, or similar in iss
 - [ ] All sub-issues squash-merged to `develop`
 - [ ] Test on `develop`
 - [ ] Cut `release-X-Y-Z` from `develop`
-- [ ] Tag on release branch; note on parent (parent already closed by last squash-merge PR)
+- [ ] Tag on release branch; close parent when release criteria are met
 
 **When hotfixing a release**
 

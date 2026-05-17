@@ -226,7 +226,7 @@ Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All 
 
 | Level | Purpose | PRs? |
 |-------|---------|------|
-| **Parent** | Release milestone — scope, release checklist, target tag | Closed when work is **squash-merged to `develop`** (tested) |
+| **Parent** | Release milestone — scope, release checklist, target tag | **No** — close manually when the release ships |
 | **Sub-issue** | One deliverable slice or bug fix — what agents implement day to day | **Yes** — one sub-issue per branch/PR |
 
 **When creating a release batch (with maintainer):**
@@ -235,8 +235,8 @@ Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All 
 2. Create **sub-issues** for each part; attach them as **sub-issues** of the parent in GitHub.
 3. Prioritize and implement **sub-issues only** — one at a time.
 4. **Bug fixes** found during testing → always a **new sub-issue** under the same parent (never bundled into an unrelated sub-issue PR).
-5. PRs to `develop` use **`Resolves`** for **both** the **sub-issue** and the **parent** (see below) — squash-merge means the work was tested on `develop`.
-6. When all sub-issues are closed and the release batch is tested on `develop`, **cut a release branch**, tag (e.g. `v0.1.0`), record the tag on the **parent**.
+5. PRs to `develop` use **`Implements`** with the **sub-issue** full URL only (see below) — squash-merge closes the sub-issue.
+6. When all sub-issues are closed and the release batch is tested on `develop`, **cut a release branch**, tag (e.g. `v0.1.0`), **close the parent** when release criteria are met.
 
 Do not file flat issues for release work without a parent when that work belongs to a planned minor version.
 
@@ -358,35 +358,28 @@ GitHub’s **Development** sidebar on the **sub-issue** (not the parent release 
 
 ### Issue ↔ PR linking (required)
 
-**On every PR to `develop` — first line (both issues):**
+**On every PR to `develop` — first line (sub-issue only):**
 
 ```text
-Resolves bmsandoval/covered#<sub-issue-number>, resolves bmsandoval/covered#<parent-issue-number>
+Implements https://github.com/Bmsandoval/covered/issues/<sub-issue-number>
 ```
 
-Example (sub-issue #3, parent release #2):
+Example (sub-issue #3):
 
 ```text
-Resolves bmsandoval/covered#3, resolves bmsandoval/covered#2
+Implements https://github.com/Bmsandoval/covered/issues/3
 ```
 
-- **Sub-issue** — the slice you implemented (branch `issue-<sub>-…`, Development link on sub-issue).
-- **Parent** — the release milestone; closes on squash-merge to `develop` because that work was tested and accepted into integration.
+- **Sub-issue** — the slice you implemented (branch `issue-<sub>-…`, Development panel shows branch/PR).
+- **Parent** — linked as a **sub-issue** in GitHub; do **not** reference it in the PR body. Close the parent manually when the release ships.
 
-Use the **full `owner/repo#issue` form** every time. Then Summary, Changes, Test plan, and links to both issues (see template). **Backlink:** comment on the **sub-issue** with the PR URL.
+Then Summary, Changes, and Test plan (see template). Do **not** add an **Issues** section — Development on the sub-issue is enough.
 
-**Hotfix PRs** (into `release-*`, not `develop`): `Resolves` only the **bug-fix sub-issue** unless maintainer says otherwise.
-
-**Verify** (optional):
-
-```bash
-gh api graphql -f query='query { repository(owner:"Bmsandoval",name:"covered") { parent: issue(number:2) { closedByPullRequestsReferences(first:5) { nodes { number } } } sub: issue(number:3) { closedByPullRequestsReferences(first:5) { nodes { number } } } } }'
-```
+**Hotfix PRs** (into `release-*`, not `develop`): `Implements` only the **bug-fix sub-issue** URL unless the maintainer says otherwise.
 
 **On every completed release (after all subs merged to `develop`):**
 
-- Add the **release tag** (e.g. `v0.2.0`) to the **parent** Links section.
-- Parent should already be closed by the last squash-merge PR; if not, close manually.
+- Cut `release-X-Y-Z`, tag, record the tag on the parent issue, and **close the parent** when release criteria are met.
 
 ### Pull request description format
 
@@ -396,9 +389,10 @@ Keep PR descriptions **short but descriptive**:
 2. **Summary (required)** — One or two sentences on **what we are doing** to solve it (broad approach, not every file).
 3. **Changes (required)** — Bullet list of concrete changes (what shipped).
 4. **Test plan** — Checklist for how it was or should be verified.
-5. **Issue** — Full link to the GitHub issue.
 
-Do not write novel-length PR bodies. Do not omit the issue link.
+The **first line** must be `Implements https://github.com/Bmsandoval/covered/issues/<N>`. Do not add a separate Issues section — GitHub **Development** links the PR on the sub-issue.
+
+Do not write novel-length PR bodies.
 
 ### No AI / editor branding in project artifacts
 
@@ -423,7 +417,7 @@ Write issues and PRs as **normal engineering artifacts**: problem, approach, cha
 **PR body skeleton:**
 
 ```markdown
-Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>
+Implements https://github.com/Bmsandoval/covered/issues/<sub>
 
 ## Summary
 
@@ -439,19 +433,14 @@ Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>
 ## Test plan
 
 - [ ] ...
-
-## Issues
-
-- Sub-issue: https://github.com/Bmsandoval/covered/issues/<sub>
-- Parent release: https://github.com/Bmsandoval/covered/issues/<parent>
 ```
 
 ### GitHub issue format
 
 When creating or drafting issues, use the structure in `docs/planning/issue-pr-workflow.md`:
 
-- **Release parent** — minor version milestone + sub-issue checklist + release criteria.
-- **Sub-issue** — **Problem**, **Goal**, **Acceptance criteria**, **Out of scope**, **Links** (parent `#N`, PR, optional `stage:` in body).
+- **Release parent** — minor version milestone + sub-issue checklist + release criteria (no parent/child/planning/PR links in the body — use GitHub **sub-issues**).
+- **Sub-issue** — **Problem**, **Goal**, **Acceptance criteria**, **Out of scope** only. Link to parent via GitHub sub-issues; branch/PR appear under **Development**.
 
 ### Agent process (checklist)
 
@@ -468,7 +457,7 @@ Before opening a PR:
 - [ ] Branch appears under the sub-issue **Development** section (via `gh issue develop` or manual link)
 - [ ] Changes map only to that issue
 - [ ] PR targets `develop`
-- [ ] First line resolves **sub-issue and parent**: `Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>`
+- [ ] First line: `Implements https://github.com/Bmsandoval/covered/issues/<sub>`
 - [ ] PR body has **no** Cursor / “Made with” footer (`gh pr view` to verify)
 - [ ] PR has same **milestone** as sub-issue and matching **labels** (`gh pr edit …`)
 - [ ] Issue commented with PR link
