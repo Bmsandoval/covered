@@ -90,8 +90,10 @@ flowchart TB
 | Item | Milestone | Labels |
 |------|-----------|--------|
 | Parent release issue | Minor version (`v0.0.0`, `v0.1.0`, …) | `release` |
-| Sub-issue | Same as parent | e.g. `documentation`, `planning`, `enhancement`, `stage:0` |
+| Sub-issue | Same as parent | e.g. `documentation`, `planning`, `enhancement`, `prototype`, `stage:0` |
 | Pull request | Same as sub-issue | Match sub-issue type labels |
+
+**`prototype` label:** use on `v0.x` release work (alongside `stage:N`). Do not use for future `v1.x` MVP milestones unless maintainer says otherwise.
 
 Create the **milestone first** (one per minor version):
 
@@ -171,7 +173,7 @@ As a <persona>, I want <goal>, so that <benefit>.
 
 | Persona | Use when |
 |---------|----------|
-| **policyholder** | MVP insurance features (upload, Q&A, citations) |
+| **policyholder** | Prototype/MVP insurance features (upload, Q&A, citations) |
 | **contributor** | Repo, CI, docs, agent workflow, release process |
 | **maintainer** | Optional alias for internal tooling; prefer **contributor** for consistency |
 
@@ -229,7 +231,9 @@ Do **not** repeat `As a … I want …` in the PR body.
 
 ## Release parent issue template
 
-**Title:** `Release v0.1.0 — <user-facing theme>` (e.g. `Release v0.1.0 — Ask My Insurance Plan`)
+**Title:** `Release v0.1.0 — Prototype: <theme>` (e.g. `Release v0.1.0 — Prototype: document upload`)
+
+Milestone description should start with `Prototype:` — see [product-phases.md](./product-phases.md). Avoid “MVP” in `v0.x` titles.
 
 ```markdown
 ## Summary
