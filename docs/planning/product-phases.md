@@ -1,6 +1,10 @@
 # Product phases
 
-How **prototype**, **MVP**, and **platform** relate. GitHub **milestones** (`v0.x.0`) track **prototype** thin releases; a future **MVP** line (e.g. `v1.x.0`) is a separate, larger bar.
+How **prototype**, **MVP**, and **platform** relate. GitHub **milestones** track work:
+
+- **`v0.0.x` patches** — small increments on the planning/`v0.0.0` line (e.g. `v0.0.1` Go stub)
+- **`v0.x.0` minors** — Option B thin prototype slices (`v0.1.0`, `v0.2.0`, …)
+- **`v1.x` MVP** (later) — separate, larger bar
 
 ## Phase overview
 
@@ -22,11 +26,15 @@ How **prototype**, **MVP**, and **platform** relate. GitHub **milestones** (`v0.
 
 **Auth (agreed):** **Anonymous sessions** — browser/session cookie, no user accounts, no OAuth in prototype. Isolate data by session id server-side.
 
-**Delivery:** **Option B — thin releases** (one user-visible slice per minor version):
+**Patches (`v0.0.x`):** small shipped steps on `release-0-0-0` (e.g. **`v0.0.1`** = Go backend stub with empty ports). PRs still merge to **`develop`** first; **tag/cut only when maintainer asks**.
+
+**Minors — Option B** (one user-visible slice per minor version):
 
 | Release | Theme | Stages (see [staged-solution-plan.md](./staged-solution-plan.md)) |
 |---------|--------|---------------------------------------------------------------------|
-| **v0.1.0** | Go app + upload PDF → chunks / doc list | 0 (app skeleton), 1 (document core) |
+| **v0.0.0** | Planning + workflow (shipped) | — |
+| **v0.0.1** | Go backend stub + port interfaces | 0 (skeleton) |
+| **v0.1.0** | Upload PDF → chunks / doc list | 1 (document core) |
 | **v0.2.0** | Cited Q&A API on uploaded docs | 3 |
 | **v0.3.0** | Plan summary + browser shell | 2, 4 |
 | **v0.4.0** | Prototype hardening on real SBCs | 5 |

@@ -10,6 +10,8 @@
 
 **Rules**
 
+- **Never merge a pull request** unless the maintainer **explicitly** asks you to merge (e.g. “merge the PR”, “LGTM merge”). After opening a PR: report the URL, what was tested, and **ask for review**. Wait for approval before `gh pr merge`.
+- **Never cut a release** (branch `release-*`, tag, `gh release create`) unless the maintainer **explicitly** asks. You may **recommend** a release when criteria look met; do not run cut/tag commands unprompted.
 - **Do not implement from planning docs alone.** Every change ties to an **open, agreed issue**. If planning implies new work, **create or propose an issue** with the maintainer — do not expand scope silently.
 - **Before coding:** read the **active issue**; skim relevant planning docs only for context.
 - **After shipping:** close/link the issue; update planning docs only when strategy materially changes (via issue or maintainer direction).
@@ -296,9 +298,18 @@ cp ex.env local.env
 
 Follow **Agent operating model** above: **planning and issue management first**, then one sub-issue per branch/PR. Full issue/PR templates live in [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).
 
+### Versioning: patch (`v0.0.x`) vs minor (`v0.x.0`)
+
+| Type | Example | When | Milestone / parent |
+|------|---------|------|---------------------|
+| **Patch** | `v0.0.1` | Small shipped increment on the **`v0.0.x` line** (e.g. first Go stub after planning-only `v0.0.0`) | Milestone `v0.0.1`; parent optional for a single sub-issue — ask maintainer |
+| **Minor (prototype)** | `v0.1.0`, `v0.2.0` | **Option B** thin prototype slices per [product-phases.md](./docs/planning/product-phases.md) | Milestone `v0.1.0` + parent `Release v0.1.0 — Prototype: …` |
+
+Do not label a **patch** (e.g. backend stub right after `v0.0.0`) as `v0.1.0` unless the maintainer says so.
+
 ### Issue hierarchy: release parent + sub-issues
 
-Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All implementation work for that release is tracked as **sub-issues** under that parent.
+Each **minor prototype version** (e.g. `v0.1.0`) gets one **top-level parent issue**. **Patch** work may use a dedicated milestone (`v0.0.1`) with one or few sub-issues. All implementation work is tracked as **sub-issues**.
 
 | Level | Purpose | PRs? |
 |-------|---------|------|
@@ -312,9 +323,9 @@ Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All 
 3. Prioritize and implement **sub-issues only** — one at a time.
 4. **Bug fixes** found during testing → always a **new sub-issue** under the same parent (never bundled into an unrelated sub-issue PR).
 5. PRs to `develop` use **`- Resolves bmsandoval/covered#<N>`** as the first line (see below) — squash-merge closes the sub-issue.
-6. When all sub-issues are closed and the release batch is tested on `develop`, **cut a release branch**, tag (e.g. `v0.1.0`), **close the parent** when release criteria are met.
+6. When the maintainer approves a release: **cut branch**, **tag**, comment on the parent — see **Cutting a release** (agents do not do this unprompted).
 
-Do not file flat issues for release work without a parent when that work belongs to a planned minor version.
+Do not file flat issues for release work without a parent when that work belongs to a planned minor version (patches excepted per maintainer).
 
 **There is no `main` / `master`.** Integration happens on `develop`; shipped minors live on **`release-*`** branches.
 
@@ -375,17 +386,22 @@ gh pr edit <number> --milestone "v0.1.0" --add-label "enhancement"
 - PR title: `Issue-<number> - <engineering summary>` — may name modules/endpoints; **not** the user-story wording (see issue-pr-workflow **Writing conventions**).
 - **Merge method: squash merge** into `develop`.
 
-**Cutting a release (after sub-issues merged and tested on `develop`):**
+**Cutting a release (maintainer-requested only):**
+
+Only when the maintainer explicitly asks. Typical flow after sub-issues are merged and tested on `develop`:
 
 ```bash
 git checkout develop && git pull
-git checkout -b release-0-1-0
+git checkout -b release-0-1-0   # match target version
 git push -u origin release-0-1-0
-git tag -a v0.1.0 -m "v0.1.0"
+git tag -a v0.1.0 -m "v0.1.0 — …"
 git push origin v0.1.0
+# optional: gh release create …
 ```
 
-Use the minor version in the branch name (`release-0-0-0` for `v0.0.0`) and matching git tag.
+**Patch example (`v0.0.1`):** update `release-0-0-0` from `develop` (merge/backmerge as agreed), tag `v0.0.1` on that branch — do not assume; follow maintainer’s release instructions.
+
+Use the version in the branch name (`release-0-0-0` for `v0.0.x`, `release-0-1-0` for `v0.1.0`) and matching git tag.
 
 **Hotfixes / patches on a shipped release:**
 
@@ -471,19 +487,9 @@ Then Summary, Changes, and Test plan (see template). Do **not** add an **Issues*
 
 **Hotfix PRs** (into `release-*`, not `develop`): `- Resolves bmsandoval/covered#<N>` for the **bug-fix sub-issue** only unless the maintainer says otherwise.
 
-**On every completed release (after all subs merged to `develop`):**
+**When a release is cut (maintainer only):** comment on the parent issue with tag and branch; check off release criteria.
 
-```bash
-git checkout develop && git pull
-git checkout -b release-X-Y-Z    # e.g. release-0-1-0 for v0.1.0
-git push -u origin release-X-Y-Z
-git tag -a vX.Y.Z -m "vX.Y.Z — <short release name>"
-git push origin vX.Y.Z
-gh release create vX.Y.Z --title "…" --notes "…"
-```
-
-- Comment on the **parent** issue with tag and release branch (check off release criteria).
-- **v0.0.0** shipped — planning/workflow only. Next: **v0.1.0** — **Prototype: document upload** (see [product-phases.md](./docs/planning/product-phases.md)).
+**Shipped:** `v0.0.0` (planning). **On `develop`:** Go backend stub (PR #15) — treat as **`v0.0.1` patch** scope, not `v0.1.0` (fix milestones/issues when maintainer agrees). **Next minor:** **v0.1.0 — Prototype: document upload** (see [product-phases.md](./docs/planning/product-phases.md)).
 
 ### Pull request description format
 
@@ -576,16 +582,25 @@ Before opening a PR:
 - [ ] PR has same **milestone** as sub-issue and matching **labels** (`gh pr edit …`)
 - [ ] Issue commented with PR link
 
-After a PR merges:
+**After opening a PR (required):**
+
+- [ ] Tell the maintainer the **PR URL**, summary, and test results (`go test`, manual checks)
+- [ ] **Ask for review** — do **not** run `gh pr merge` unless they explicitly approve
+
+After a PR merges (only after maintainer merged or asked you to merge):
 
 - [ ] Delete stale remote branches for that issue (`issue-<N>-*`, any `N-add-…` auto branch)
 
-Before considering a minor version “released”:
+Before recommending a release to the maintainer (do not execute unless asked):
 
-- [ ] All sub-issues squash-merged to `develop`
+- [ ] All sub-issues for that version squash-merged to `develop`
 - [ ] Tested on `develop` with maintainer
+- [ ] Suggest: cut `release-X-Y-Z`, tag, `gh release create`, parent comment — **wait for explicit “yes”**
+
+Release execution checklist (maintainer-requested only):
+
 - [ ] `release-X-Y-Z` cut from `develop` and pushed
-- [ ] Tag (e.g. `v0.1.0`) on **release branch**; `gh release create` optional; tag noted on parent issue (comment)
+- [ ] Tag on **release branch**; optional `gh release create`; parent issue comment
 - [ ] Any release-branch hotfixes backmerged to `develop` (regular merge)
 
 ## Repository conventions
