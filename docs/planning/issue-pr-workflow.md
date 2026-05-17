@@ -1,6 +1,6 @@
 # Issue and PR workflow (reference)
 
-Canonical templates for GitHub issues and pull requests. Agents must follow [AGENTS.md](../../AGENTS.md) **Development workflow**; this doc is the detailed model.
+Canonical templates for GitHub issues and pull requests. Agents must follow [AGENTS.md](../../AGENTS.md) **Agent operating model** (planning first, create/manage issues) and **Development workflow**; this doc is the detailed template reference.
 
 ## Branching and releases
 

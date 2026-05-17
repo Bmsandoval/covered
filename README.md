@@ -100,6 +100,8 @@ There is **no `main` / `master`**.
 
 **Workflow (short):**
 
+Agents **start in planning** — read `docs/planning/`, then **create and manage GitHub issues** (milestones, parent release, sub-issues) with the maintainer before coding. See [AGENTS.md](./AGENTS.md).
+
 1. Each minor version has a **parent release issue** (milestone `v0.x.0`) and **sub-issues** for the parts — implement **one sub-issue** at a time.
 2. Before the first commit: `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (links branch on the issue).
 3. PR to `develop`, title `Issue-<sub> - <description>`, first line **`Implements https://github.com/Bmsandoval/covered/issues/<sub>`** — **squash merge** (closes the sub-issue).

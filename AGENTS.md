@@ -10,10 +10,58 @@
 
 **Rules**
 
-- **Do not implement from planning docs alone.** Every change ties to an **open, agreed issue**. If planning implies new work, ask for or draft an issue — do not expand scope silently.
+- **Do not implement from planning docs alone.** Every change ties to an **open, agreed issue**. If planning implies new work, **create or propose an issue** with the maintainer — do not expand scope silently.
 - **Before coding:** read the **active issue**; skim relevant planning docs only for context.
 - **After shipping:** close/link the issue; update planning docs only when strategy materially changes (via issue or maintainer direction).
 - Issues win on scope conflicts; planning docs win on long-term direction.
+
+## Agent operating model (planning first, issues as you go)
+
+**On every new session, start in the planning phase.** Do not jump straight to application code until the work queue on GitHub is clear for what you are about to do.
+
+### 1. Planning phase (do this first)
+
+1. **Read strategy** — [`docs/planning/product-vision.md`](./docs/planning/product-vision.md), [`staged-solution-plan.md`](./docs/planning/staged-solution-plan.md), and any doc relevant to the maintainer’s goal.
+2. **Read the queue** — open milestones, parent release issues, and sub-issues (`gh issue list`, parent/sub relationships on GitHub).
+3. **Align with the maintainer** — confirm which **minor version** (milestone) and which **sub-issue** is in scope for this session. If the milestone or parent release does not exist yet, **create them** before coding.
+4. **Break work into issues** — map the next slice of the staged plan to a **parent release issue** (if needed) and **sub-issues** with acceptance criteria. Use templates in [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).
+
+Planning docs describe *what could be built*; **GitHub issues describe what we are building now**.
+
+### 2. Create and manage issues (ongoing)
+
+You are expected to **create, update, and organize issues** as work proceeds — not only wait for the maintainer to file them.
+
+| Action | When |
+|--------|------|
+| **Create milestone** | Starting a new minor version (e.g. `v0.1.0`) |
+| **Create parent release issue** | New release batch; link sub-issues under it in GitHub |
+| **Create sub-issues** | Each implementable slice, bug found in testing, or scope split |
+| **Edit issue bodies** | Acceptance criteria change; keep bodies minimal (no parent/PR/planning links in text — use sub-issues + Development) |
+| **Update parent checklist** | Check off sub-issues on the parent as they merge to `develop` |
+| **Close parent** | Manually when release criteria are met (tag cut, tested, all subs closed) |
+
+Use the GitHub CLI (`gh issue create`, `gh issue edit`, milestones, labels) and follow **Labels and milestones** and **Issue hierarchy** below.
+
+**Do not** implement features that exist only in `docs/planning/` until there is a **prioritized sub-issue** the maintainer agrees to.
+
+### 3. Implementation phase (after planning)
+
+Only after an **active sub-issue** is agreed:
+
+1. `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (before first commit)
+2. Implement **only** that sub-issue’s acceptance criteria
+3. Open PR to `develop` with `Implements https://github.com/Bmsandoval/covered/issues/<N>` (see **Development workflow**)
+4. After merge: pick the next sub-issue or return to planning if the release batch needs more breakdown
+
+### New session quick start
+
+```
+1. Read docs/planning/ + list open issues
+2. Confirm milestone / parent / next sub-issue with maintainer
+3. Create or refine issues if the queue is missing or stale
+4. Then branch → code → PR for one sub-issue at a time
+```
 
 ## Product vision
 
@@ -218,7 +266,7 @@ cp ex.env local.env
 
 ## Development workflow
 
-Follow this process on every change. Full issue/PR examples live in [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).
+Follow **Agent operating model** above: **planning and issue management first**, then one sub-issue per branch/PR. Full issue/PR templates live in [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).
 
 ### Issue hierarchy: release parent + sub-issues
 
@@ -444,7 +492,15 @@ When creating or drafting issues, use the structure in `docs/planning/issue-pr-w
 
 ### Agent process (checklist)
 
-Before coding:
+**New session / planning (before any code):**
+
+- [ ] Read relevant `docs/planning/` (vision, staged plan, connectors if needed)
+- [ ] List open issues and milestones; identify current minor version and parent release
+- [ ] Confirm with maintainer what this session should deliver
+- [ ] Create or update **milestone**, **parent release**, and **sub-issues** if the queue is incomplete (use `gh`, templates in issue-pr-workflow.md)
+- [ ] Link sub-issues to parent in GitHub; apply milestone + labels
+
+**Before coding (implementation):**
 
 - [ ] Confirm the active **sub-issue** number and that it is the current priority
 - [ ] Sub-issue has correct **milestone** (minor version) and **labels**
