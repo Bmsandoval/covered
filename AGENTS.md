@@ -21,7 +21,7 @@
 
 ### 1. Planning phase (do this first)
 
-1. **Read strategy** — [`docs/planning/product-vision.md`](./docs/planning/product-vision.md), [`staged-solution-plan.md`](./docs/planning/staged-solution-plan.md), and any doc relevant to the maintainer’s goal.
+1. **Read strategy** — [`product-phases.md`](./docs/planning/product-phases.md) (prototype vs MVP), [`product-vision.md`](./docs/planning/product-vision.md), [`staged-solution-plan.md`](./docs/planning/staged-solution-plan.md), and any doc relevant to the maintainer’s goal.
 2. **Read the queue** — open milestones, parent release issues, and sub-issues (`gh issue list`, parent/sub relationships on GitHub).
 3. **Align with the maintainer** — confirm which **minor version** (milestone) and which **sub-issue** is in scope for this session. If the milestone or parent release does not exist yet, **create them** before coding.
 4. **Break work into issues** — map the next slice of the staged plan to a **parent release issue** (if needed) and **sub-issues** with acceptance criteria. Use templates in [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).
@@ -70,17 +70,27 @@ Only after an **active sub-issue** is agreed:
 
 **North star (later):** **Personal data vault** — but **long-term storage in Covered is opt-in later** (“pin to vault”), not required for early releases. **Connectors** (e.g. Google Drive) may **read through** to the user’s cloud without keeping raw files; see [connectors-and-storage.md](./docs/planning/connectors-and-storage.md).
 
-**MVP (build now):** **Insurance documents via upload** — “Ask My Insurance Plan.” Same core pattern (ingest → chunk → retrieve → cite). Do not implement Drive connectors, arbitrary formats, or vault persistence unless an issue explicitly says so.
+**Prototype (build now, `v0.x`):** Prove **citation-backed Q&A** on **insurance upload** — thin releases per [product-phases.md](./docs/planning/product-phases.md). Same core pattern (ingest → chunk → retrieve → cite). **MVP** (`v1.x`, later) is a **shippable** product with a much higher bar — do not call prototype work “MVP” in issues or releases.
 
-**After MVP (issue-driven):** Any-format cited Q&A → cloud connectors → cross-corpus search → opt-in vault storage.
+**After prototype / MVP (issue-driven):** Any-format cited Q&A → cloud connectors → cross-corpus search → opt-in vault storage.
 
-When implementing MVP features, prefer **reusable building blocks** (`DocumentSource`, chunking, retrieval, citation envelope) over one-off insurance shortcuts unless the issue explicitly calls for insurance-specific logic.
+When implementing prototype features, prefer **reusable building blocks** (`DocumentSource`, chunking, retrieval, citation envelope) over one-off insurance shortcuts unless the issue explicitly calls for insurance-specific logic.
 
 ---
 
-**MVP positioning:** Covered is an **insurance document interpreter with receipts**, not an AI health advisor or cost predictor. Build and review MVP changes against that positioning.
+**Positioning (prototype and MVP):** Covered is an **insurance document interpreter with receipts**, not an AI health advisor or cost predictor. Build and review changes against that positioning.
 
-## Product goal (MVP)
+## Stack and auth (prototype)
+
+| Area | Choice |
+|------|--------|
+| **Language** | **Go** — application code, APIs, workers |
+| **Auth** | **Anonymous sessions** — session cookie / id; **no user accounts** in `v0.x` |
+| **Data scope** | Uploads, chunks, and chat state keyed by **session id** server-side |
+
+Do not add OAuth, signup, or multi-tenant accounts unless a **non-prototype** issue explicitly says so.
+
+## Product goal (prototype demo narrative)
 
 **“Ask My Insurance Plan”** — Users upload or enter insurance information, then ask questions such as:
 
@@ -92,7 +102,7 @@ When implementing MVP features, prefer **reusable building blocks** (`DocumentSo
 
 The app answers **only** from the user’s uploaded documents, with citations. If the documents do not support an answer, say so and suggest what to ask the insurer.
 
-## Non-goals (do not build in MVP)
+## Non-goals (do not build in prototype `v0.x`)
 
 **Insurance / trust boundaries**
 
@@ -102,7 +112,7 @@ The app answers **only** from the user’s uploaded documents, with citations. I
 - Provider-side or billing-workflow tools
 - Definitive “you will owe $X” predictions
 
-**Post-MVP / north star (do not build until prioritized in an issue)**
+**Platform / north star (do not build until prioritized in an issue)**
 
 - Arbitrary non-insurance document types
 - Google Drive / Dropbox / OneDrive connectors
@@ -110,7 +120,7 @@ The app answers **only** from the user’s uploaded documents, with citations. I
 - Opt-in **vault** long-term storage (pin/save copy in Covered)
 - Multi-domain dashboards beyond what the current issue requires
 
-Keeping MVP to **insurance document upload + cited Q&A** reduces legal and technical risk while we prove the citation-first pattern.
+Keeping the **prototype** to **insurance upload + cited Q&A** reduces legal and technical risk while we prove the citation-first pattern before MVP investment.
 
 ## Hard rules for the chat agent
 
@@ -193,17 +203,17 @@ Note: This may not include labs, imaging, facility fees, or out-of-network charg
 
 ## Positioning (copy and UX)
 
-**MVP — use:** “Understand your insurance documents before you get surprised by a bill.”
+**Prototype / MVP — use:** “Understand your insurance documents before you get surprised by a bill.”
 
-**MVP — avoid:** “Predict exactly what your care will cost.”
+**Prototype / MVP — avoid:** “Predict exactly what your care will cost.”
 
-**Long-term (do not lead with in MVP marketing):** “Your personal data vault” / “search all your documents with citations” — accurate as direction, premature as the primary promise until post-MVP.
+**Long-term (do not lead with in prototype marketing):** “Your personal data vault” / “search all your documents with citations” — accurate as direction, premature as the primary promise until platform stages.
 
 Brand tone: trustworthy, calm, financially literate — not clinical, not “AI hype,” not insurer-like. The vault vision should feel like **privacy and receipts**, not “upload everything to our cloud” hype.
 
 ## Implementation guidance
 
-- Prefer **upload** in MVP; design ingest around a **`DocumentSource`** abstraction so connectors can be added without rewrite (see [connectors-and-storage.md](./docs/planning/connectors-and-storage.md)).
+- Prefer **upload** in prototype; design ingest around a **`DocumentSource`** abstraction so connectors can be added without rewrite (see [connectors-and-storage.md](./docs/planning/connectors-and-storage.md)).
 - Do not add insurer portal or EMR integrations.
 - Treat extraction errors as first-class: show confidence and missing fields openly.
 - Store and display **provenance** alongside normalized values; never show a number without a source path when one exists.
@@ -238,7 +248,7 @@ Use clear filenames (e.g. `mvp-scope.md`, `ingestion-spike.md`, `adr-001-documen
 
 **Key planning docs:** [product-vision.md](./docs/planning/product-vision.md), [staged-solution-plan.md](./docs/planning/staged-solution-plan.md), [connectors-and-storage.md](./docs/planning/connectors-and-storage.md).
 
-Planning informs **issue writing and design**; **issues drive implementation**. Tag issues with stage when useful (e.g. `stage:1`). Do not implement post-MVP stages without a prioritized issue.
+Planning informs **issue writing and design**; **issues drive implementation**. Tag issues with `stage:N` and optionally **`prototype`** for `v0.x` work. Do not implement platform stages (6–9) or **MVP** scope without a prioritized issue.
 
 ## Environment variables
 
@@ -280,7 +290,7 @@ Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All 
 
 **When creating a release batch (with maintainer):**
 
-1. Create the **parent issue** first (title e.g. `Release v0.1.0 — Insurance MVP`).
+1. Create the **parent issue** first (title e.g. `Release v0.1.0 — Prototype: document upload`).
 2. Create **sub-issues** for each part; attach them as **sub-issues** of the parent in GitHub.
 3. Prioritize and implement **sub-issues only** — one at a time.
 4. **Bug fixes** found during testing → always a **new sub-issue** under the same parent (never bundled into an unrelated sub-issue PR).
@@ -309,7 +319,7 @@ Every **parent**, **sub-issue**, and **PR** for a release must have:
 
 ```bash
 # Create milestone (once per minor version)
-gh api repos/Bmsandoval/covered/milestones -f title="v0.1.0" -f description="Insurance MVP — …"
+gh api repos/Bmsandoval/covered/milestones -f title="v0.1.0" -f description="Prototype: document upload (Go, anon sessions)"
 
 # Parent issue
 gh issue create --title "Release v0.1.0 — …" --milestone "v0.1.0" --label "release"
@@ -456,7 +466,7 @@ gh release create vX.Y.Z --title "…" --notes "…"
 ```
 
 - Comment on the **parent** issue with tag and release branch (check off release criteria).
-- **v0.0.0** dry run is complete (`release-0-0-0`, tag `v0.0.0`); next batch is **v0.1.0** (Insurance MVP).
+- **v0.0.0** shipped — planning/workflow only. Next: **v0.1.0** — **Prototype: document upload** (see [product-phases.md](./docs/planning/product-phases.md)).
 
 ### Pull request description format
 
@@ -567,9 +577,24 @@ Before considering a minor version “released”:
 - Do not commit secrets; use `local.env` for local secrets (see **Environment variables** above).
 - Prefer clear module boundaries: `ingestion`, `normalization`, `retrieval`, `chat` (names may evolve with stack).
 
-When unsure whether a feature fits MVP, ask:
+When unsure whether a feature fits the **current prototype** issue, ask:
 
 1. **Does this help interpret uploaded insurance documents with citations**, without predicting final bills or requiring insurer login?
-2. **If we built it generically, would it still help the post-MVP vault?** Prefer designs that satisfy both when cost is similar.
+2. **Is it required for the active `v0.x` release theme**, or is it **MVP/platform** scope? Defer MVP (accounts, production ops, polish) and platform (Drive, vault) unless explicitly issued.
+3. **If we built it generically, would it still help the later vault?** Prefer designs that satisfy both when cost is similar.
 
-If neither applies, defer it or put it in `docs/planning/` for post-MVP.
+If it is not prototype scope, defer it or capture in `docs/planning/` until a milestone exists.
+
+## GitHub repository metadata
+
+Align public signals with **prototype** (not MVP):
+
+| Surface | Guidance |
+|---------|----------|
+| **About** | `Prototype · Citation-backed Q&A over your insurance documents` — optional `· Go` |
+| **Topics** | `prototype`, `golang`, `insurance`, `citations` (and similar) |
+| **Milestones** | `v0.x.0` with description prefix `Prototype: …` |
+| **Parent issue title** | `Release v0.x.0 — Prototype: <theme>` |
+| **Label `prototype`** | Use on `v0.x` parents/subs alongside `stage:N` |
+
+Do not use “MVP” in milestone or release titles until a **`v1.x` MVP** batch is explicitly planned.

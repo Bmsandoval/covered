@@ -1,36 +1,39 @@
 # Covered
 
-**Understand your health insurance before the bill arrives.**
+**Prototype · Citation-backed Q&A over your insurance documents**
 
-Covered’s core product is **citation-based Q&A over your own data** — answers grounded in your files with sources, confidence, and honest gaps. We start with **insurance documents** (upload), then expand formats, **cloud connectors** (e.g. Google Drive read-through), and later **opt-in** long-term vault storage.
+Understand your health insurance before the bill arrives — with **sources**, not guesses.
 
-> **Now (MVP):** “Ask My Insurance Plan” — upload SBCs, EOCs, cards, plan files.  
-> **Next:** Any-format cited Q&A → Drive/connectors → cross-file search → optional “pin to vault.”
+Covered’s core product is **citation-based Q&A over your own data** — answers grounded in your files with document, page, and section references, confidence, and honest gaps. We are in the **prototype** phase (`v0.x`): prove the loop on insurance **upload**, then pursue a full **MVP** later (`v1.x`, much higher bar). See [product phases](docs/planning/product-phases.md).
+
+> **Now (prototype):** Insurance upload → chunks → cited Q&A (Go, anonymous sessions).  
+> **Later (MVP):** Shippable “Ask My Insurance Plan” product.  
+> **Platform:** Any-format Q&A → Drive/connectors → cross-file search → optional pin-to-vault.
 
 ## Vision
 
-Many products answer from the open internet or offer storage without proof. Covered’s bet: **your data, cited answers.** Insurance is the first domain; the pattern (ingest → chunk → retrieve → cite) generalizes. We do **not** require storing all your files on day one — connectors can read from your cloud; durable vault copy is **opt-in later**.
+Many products answer from the open internet or offer storage without proof. Covered’s bet: **your data, cited answers.** Insurance is the first domain; the pattern (ingest → chunk → retrieve → cite) generalizes.
 
 | Phase | Focus |
 |-------|--------|
-| **MVP** | Insurance upload — extract plan details, cited Q&A |
-| **Post-MVP** | Any-format cited Q&A; Google Drive (read-through) |
-| **Later** | Search across all sources; optional pin/save in Covered vault |
+| **Prototype** (`v0.x`) | Thin releases — upload, cited Q&A, demo UI, hardening on SBCs |
+| **MVP** (`v1.x`, planned) | Production-ready insurance product (beyond prototype) |
+| **Platform** | Any-format cited Q&A; Google Drive (read-through); cross-corpus search; opt-in vault |
 
-**How we build:** prioritized [GitHub issues](https://github.com/Bmsandoval/covered/issues); strategy in [`docs/planning/`](./docs/planning/) (not a substitute for issues).
+**How we build:** prioritized [GitHub issues](https://github.com/Bmsandoval/covered/issues); strategy in [`docs/planning/`](docs/planning/).
 
-Staged plan: [`staged-solution-plan.md`](./docs/planning/staged-solution-plan.md) · Connectors: [`connectors-and-storage.md`](./docs/planning/connectors-and-storage.md).
+Staged plan: [`staged-solution-plan.md`](docs/planning/staged-solution-plan.md) · Phases: [`product-phases.md`](docs/planning/product-phases.md) · Connectors: [`connectors-and-storage.md`](docs/planning/connectors-and-storage.md).
 
-## The problem (MVP)
+## The problem (insurance first)
 
-Insurance plans are dense PDFs, inconsistent terminology, and surprise bills. People need clarity on deductibles, copays, referrals, and in-network rules **before** they choose care — not a chatbot that guesses or a “vault” that does not exist yet.
+Insurance plans are dense PDFs, inconsistent terminology, and surprise bills. People need clarity on deductibles, copays, referrals, and in-network rules **before** they choose care — not a chatbot that guesses.
 
-## What Covered does today (MVP scope)
+## What the prototype aims to demonstrate
 
-- **Upload** insurance materials (Summary of Benefits, Evidence of Coverage, card photos, deductible screenshots).
+- **Upload** insurance materials (SBC, EOC, card photos, deductible screenshots).
 - **Extract** key plan details with **provenance** (document, page, section).
-- **Ask questions** in plain English; answers come **only from your uploads**, with citations and confidence.
-- **Flag gaps** and suggest what to ask your insurer when documents are silent.
+- **Ask questions** in plain English; answers from **your uploads only**, with citations.
+- **Flag gaps** when documents are silent.
 
 ### Example questions
 
@@ -49,21 +52,20 @@ Instead:
 > Your uploaded Summary of Benefits lists a **$40 specialist copay** for in-network care.  
 > **Source:** SBC page 3, “Specialist Visit.”  
 > **Confidence:** High.  
-> **Note:** Confirm with your insurer before making care decisions; labs, facility fees, and out-of-network care may differ.
+> **Note:** Confirm with your insurer before making care decisions.
 
-## MVP vs later
+## Prototype vs later
 
-| MVP (insurance upload) | Post-MVP |
-|------------------------|----------|
-| SBC, EOC, card, deductible screenshots | More formats (PDF, images, …) |
-| Plan-specific extraction | Domain-agnostic cited Q&A |
-| Stored uploads + chunks | Drive read-through (files stay in Drive by default) |
-| “Ask My Insurance Plan” | Cross-file cited search |
-| — | Opt-in **pin to vault** (long-term storage in Covered) |
+| Prototype (`v0.x`) | MVP / platform (later) |
+|--------------------|-------------------------|
+| Go API, **anonymous sessions** | Accounts, production ops (MVP) |
+| SBC, EOC, card, screenshots | More formats; Drive connectors |
+| Local/demo deploy OK | Hosted, scaled product (MVP) |
+| Prove citation loop | Shippable “Ask My Insurance Plan” |
 
-**Explicitly out of MVP:** Google Drive OAuth, arbitrary formats, mandatory cloud vault, EMR/insurer login, bill prediction (“you will owe X”).
+**Out of prototype:** user accounts, Google Drive OAuth, arbitrary formats, mandatory vault, EMR/insurer login, bill prediction.
 
-## How it works (MVP)
+## How it works (target architecture)
 
 ```mermaid
 flowchart LR
@@ -75,58 +77,54 @@ flowchart LR
   F --> G[Cited answer or honest gap]
 ```
 
-1. **Ingest** — Parse uploads; preserve page numbers, sections, and tables.
-2. **Normalize** — Store structured fields each linked to a source (insurance-specific in MVP).
-3. **Chat** — Retrieve evidence, answer with citations or refuse when unsupported.
-
 ## Product principles
 
 - **Citation-first** — Every answer names the document and location.
-- **Interpreter, not oracle** — We explain what your documents say, not what you will definitely pay.
-- **Honest uncertainty** — Low confidence and missing data are shown, not hidden.
-- **Vault-ready architecture** — Prefer reusable ingestion and retrieval; avoid insurance-only dead ends when a generic pattern is cheap.
-- **Trust over hype** — Calm, clear tone; not a replacement for your insurer or care team.
+- **Interpreter, not oracle** — Explain what documents say, not guaranteed final cost.
+- **Honest uncertainty** — Show low confidence and missing data.
+- **Vault-ready design** — Reusable ingest/retrieval; avoid dead-end shortcuts.
+- **Trust over hype** — Calm tone; not a substitute for your insurer or care team.
 
 ## Development
 
-We build in small, reviewable slices tied to **GitHub issues** (planning docs in [`docs/planning/`](./docs/planning/) inform strategy; **issues are the work queue**).
+We build in small slices tied to **GitHub issues**. Agents read [`AGENTS.md`](AGENTS.md) and [`docs/planning/`](docs/planning/) before coding.
 
 | Branch | Purpose |
 |--------|---------|
 | [`develop`](https://github.com/Bmsandoval/covered/tree/develop) | Integration — feature PRs **squash-merge** here |
-| `release-X-Y-Z` (e.g. `release-0-0-0`) | Cut from `develop` per minor version; hotfixes land here, then **backmerge** to `develop` |
+| `release-X-Y-Z` | Cut from `develop` per minor version; hotfixes, then **backmerge** |
 
 There is **no `main` / `master`**.
 
-**Workflow (short):**
-
-Agents **start in planning** — read `docs/planning/`, then **create and manage GitHub issues** (milestones, parent release, sub-issues) with the maintainer before coding. See [AGENTS.md](./AGENTS.md).
-
-1. Each minor version has a **parent release issue** (milestone `v0.x.0`) and **sub-issues** for the parts — implement **one sub-issue** at a time.
-2. Before the first commit: `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (links branch on the issue).
-3. PR to `develop`, title `Issue-<sub> - <description>`, first line **`- Resolves bmsandoval/covered#<sub>`** — **squash merge** (closes the sub-issue).
-4. Bug fixes → **new sub-issue** under the parent, not bundled into another PR.
-5. Test on `develop`; cut `release-0-1-0` from `develop`; tag on the release branch (e.g. `v0.1.0`).
-6. Hotfixes: branch from `release-*` → squash to release → **regular merge** back to `develop`.
-
-Full rules (labels, milestones, no tool branding, env files): [AGENTS.md](./AGENTS.md) · Templates: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).
+**Prototype release train (Option B):** `v0.1.0` upload → `v0.2.0` cited Q&A → `v0.3.0` UI → `v0.4.0` hardening. Details in [product-phases.md](docs/planning/product-phases.md).
 
 **Local setup:**
 
 ```bash
 cp ex.env local.env
-# Edit local.env with your values
+# Edit local.env (SESSION_SECRET, keys when wired)
 ```
 
 ## Status
 
-**v0.0.0** shipped (`release-0-0-0`, tag [`v0.0.0`](https://github.com/Bmsandoval/covered/releases/tag/v0.0.0)) — planning docs and contributor workflow on `develop`.
+| Release | State |
+|---------|--------|
+| **v0.0.0** | Shipped — planning, workflow, `AGENTS.md` ([tag](https://github.com/Bmsandoval/covered/releases/tag/v0.0.0)) |
+| **v0.1.0** | Next — **Prototype: document upload** (Go skeleton + PDF → chunks) |
 
-**Next:** **v0.1.0** — Insurance MVP (Ask My Insurance Plan). Post-MVP vault features remain direction only until prioritized in issues.
+**Stack:** Go · anonymous sessions (prototype).
+
+## GitHub About line
+
+Recommended repo description (you can tweak):
+
+`Prototype · Citation-backed Q&A over your insurance documents`
+
+Optional topics: `prototype`, `golang`, `insurance`, `citations`.
 
 ## Disclaimer
 
-Covered helps you read and question your **own insurance documents** (MVP). It is not medical, legal, or financial advice, and it is not a substitute for your insurer, provider, or licensed professional. Always confirm coverage and costs with your plan before receiving care.
+Covered is a **prototype** tool to help you read and question **your own insurance documents**. It is not medical, legal, or financial advice. Confirm coverage and costs with your plan before receiving care.
 
 ## License
 

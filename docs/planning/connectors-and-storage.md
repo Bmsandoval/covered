@@ -18,7 +18,7 @@ The **personal data vault** is a **container story**, not the first technical re
 
 | Mode | When | Where bytes live | Our persistence |
 |------|------|------------------|-----------------|
-| **Upload (MVP)** | User picks files in app | Copied to app storage (dev: disk; prod: object store) | File + chunks + embeddings until user deletes |
+| **Upload (prototype/MVP)** | User picks files in app | Copied to app storage (dev: disk; prod: object store) | File + chunks + embeddings until user deletes; scoped by **session** in prototype |
 | **Connector read-through** | User links Google Drive (etc.) | Stays in their cloud | Prefer **no full file copy**; see below |
 | **Vault pin (later)** | User explicitly “save to Covered” | Covered storage | Durable copy + same chunk/index pipeline |
 
@@ -69,7 +69,7 @@ On each Q&A or ingest job:
 - Rate limits and large-file timeouts
 - User disconnect = delete tokens + cached chunks for that source
 
-**Do not start connectors in MVP issues** unless explicitly prioritized; design Stage 1 APIs so a source ref is not upload-only.
+**Do not start connectors in prototype issues** unless explicitly prioritized; design Stage 1 APIs so a source ref is not upload-only.
 
 ---
 
@@ -77,8 +77,9 @@ On each Q&A or ingest job:
 
 | Phase | Storage story |
 |-------|----------------|
-| **MVP (insurance upload)** | Simple upload + stored chunks — acceptable to prove ingestion and Q&A |
-| **Post-MVP** | Any format + **connectors** with read-through + chunk cache |
+| **Prototype (`v0.x`, insurance upload)** | Upload + stored chunks; scoped by **anonymous session** |
+| **MVP (`v1.x`)** | Production storage, retention, security (TBD in issues) |
+| **Platform** | Any format + **connectors** with read-through + chunk cache |
 | **Later** | **Opt-in vault** — durable Covered copy, export, retention policies |
 
 ---
@@ -96,4 +97,4 @@ On each Q&A or ingest job:
 - Maximum file size / page count for in-memory extract
 - Whether chunk cache requires separate user consent
 - Single Google account vs workspace accounts
-- Insurance MVP: stay upload-only until Stage 5 release, then connector spike issue
+- Insurance prototype: stay upload-only through `v0.4.0`; connector spike only via platform issues

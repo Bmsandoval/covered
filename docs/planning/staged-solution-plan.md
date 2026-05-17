@@ -3,8 +3,9 @@
 Problem restatement and phased delivery for Covered.
 
 - **Primary offering:** citation-based Q&A over the user’s data (any supported format, over time).
-- **MVP:** insurance documents via **upload**.
-- **Later:** cloud **connectors** (read-through), cross-corpus search, **opt-in vault storage**.
+- **Prototype (now):** insurance documents via **upload** — thin `v0.x` releases ([product-phases.md](./product-phases.md)).
+- **MVP (later):** shippable product beyond prototype (`v1.x` TBD).
+- **Platform (later):** cloud **connectors**, cross-corpus search, **opt-in vault storage**.
 
 **Execution:** GitHub **issues** are the work queue; this doc is strategy. Do not build stages without a prioritized issue.
 
@@ -42,7 +43,7 @@ A system where users bring documents they already have (**upload or, later, clou
 3. **Honest** about confidence and gaps  
 4. **Safe in tone** — interpreter, not bill oracle or licensed advisor  
 
-### Why insurance first (MVP)
+### Why insurance first (prototype domain)
 
 - Pain is frequent and emotionally costly (surprise bills).
 - Document types are somewhat standardized (SBC/EOC).
@@ -61,7 +62,7 @@ Jumping straight to “store everything forever” duplicates storage products a
 
 ```mermaid
 flowchart TB
-  subgraph now [MVP - Insurance]
+  subgraph now [Prototype - Insurance]
     U1[Upload insurance docs]
     I1[Ingest and chunk]
     E1[Insurance extraction]
@@ -71,7 +72,7 @@ flowchart TB
     I1 --> C1
   end
 
-  subgraph later [Post-MVP]
+  subgraph later [Platform / post-prototype]
     U2[Upload any format]
     G[Drive connector read-through]
     I2[Same ingest core]
@@ -88,28 +89,43 @@ flowchart TB
 
 **Reusable core (build once, extend later):** `DocumentSource` abstraction, text/OCR extraction, chunking + metadata, retrieval, citation answer envelope, refusal when evidence is weak.
 
-**Insurance-specific (MVP layer):** plan field extractors, insurance prompts, dashboard fields, insurer-oriented copy and disclaimers.
+**Insurance-specific (prototype layer):** plan field extractors, insurance prompts, dashboard fields, insurer-oriented copy and disclaimers.
 
-**Storage policy:** MVP uses upload + stored chunks. Connectors avoid raw file retention by default; **vault pin** is explicit long-term storage later ([connectors-and-storage.md](./connectors-and-storage.md)).
+**Storage policy:** Prototype uses upload + stored chunks, scoped by **anonymous session**. Connectors avoid raw file retention by default; **vault pin** is explicit long-term storage later ([connectors-and-storage.md](./connectors-and-storage.md)).
+
+**Implementation language:** **Go** for application services unless an issue says otherwise.
 
 ---
 
 ## Stages overview
 
-| Stage | Name | User-visible outcome | Target |
+| Stage | Name | User-visible outcome | Phase |
 |-------|------|----------------------|--------|
-| 0 | Foundation | Repo runs locally; env and workflow documented | Pre-MVP |
-| 1 | Document core | Upload a file; text extracted and chunked with page refs | MVP + foundation |
-| 2 | Insurance understanding | “Here’s your deductible, copays, OOP max” with sources | MVP |
-| 3 | Cited Q&A | Ask a plan question; get cited answer or honest gap | MVP |
-| 4 | MVP product shell | Upload → dashboard → chat in a browser | MVP ship |
-| 5 | MVP hardening | Reliable on real SBCs; edge cases and disclaimers | MVP quality |
-| 6 | Any-format Q&A | Upload non-insurance docs; same cited Q&A pattern | Post-MVP |
-| 7 | Cloud connectors | Link Google Drive; Q&A without mirroring whole Drive | Post-MVP |
-| 8 | Cross-corpus search | Ask/search across all sources with citations | Post-MVP |
+| 0 | Foundation | Go app runs locally; env and workflow documented | Prototype |
+| 1 | Document core | Upload a file; text extracted and chunked with page refs | Prototype |
+| 2 | Insurance understanding | “Here’s your deductible, copays, OOP max” with sources | Prototype |
+| 3 | Cited Q&A | Ask a plan question; get cited answer or honest gap | Prototype |
+| 4 | Prototype product shell | Upload → dashboard → chat in a browser | Prototype |
+| 5 | Prototype hardening | Reliable on real SBCs; edge cases and disclaimers | Prototype |
+| 6 | Any-format Q&A | Upload non-insurance docs; same cited Q&A pattern | Platform |
+| 7 | Cloud connectors | Link Google Drive; Q&A without mirroring whole Drive | Platform |
+| 8 | Cross-corpus search | Ask/search across all sources with citations | Platform |
 | 9 | Opt-in vault storage | User pins copies in Covered; retention/export TBD | North star |
 
-Stages 0–5 = **insurance MVP (upload).** Stages 6–9 = **cited Q&A platform + connectors + optional vault.**
+Stages 0–5 = **insurance prototype (upload, Go, anon sessions).** Stages 6–9 = **platform expansion** (issue-driven after MVP is defined).
+
+### Prototype release train (Option B)
+
+Map stages to **thin minor versions** — one parent issue per row:
+
+| Release | Parent title theme | Stages | User-visible milestone |
+|---------|-------------------|--------|------------------------|
+| **v0.1.0** | Prototype: document upload | 0 (app) + 1 | Upload PDF → chunks + doc list |
+| **v0.2.0** | Prototype: cited Q&A | 3 | Ask questions with citations via API |
+| **v0.3.0** | Prototype: plan summary and UI | 2 + 4 | Dashboard + browser demo |
+| **v0.4.0** | Prototype: hardening | 5 | Trustworthy on sample/real SBCs |
+
+**v0.0.0** (shipped) = planning and workflow only — not product code.
 
 ---
 
@@ -208,7 +224,7 @@ Stages 0–5 = **insurance MVP (upload).** Stages 6–9 = **cited Q&A platform +
 
 ---
 
-## Stage 4 — MVP product shell
+## Stage 4 — Prototype product shell
 
 **Goal:** One coherent flow a non-developer can use.
 
@@ -228,9 +244,9 @@ Stages 0–5 = **insurance MVP (upload).** Stages 6–9 = **cited Q&A platform +
 
 ---
 
-## Stage 5 — MVP hardening
+## Stage 5 — Prototype hardening
 
-**Goal:** Trustworthy enough to dogfood, cut a release branch, and tag a minor version.
+**Goal:** Trustworthy enough to dogfood the **prototype**, cut a release branch, and tag `v0.4.0` (prototype — not MVP).
 
 **Deliverables**
 
@@ -245,11 +261,11 @@ Stages 0–5 = **insurance MVP (upload).** Stages 6–9 = **cited Q&A platform +
 
 - Agreed test checklist passes on `develop`
 - Known bad inputs fail gracefully
-- Release tag recorded on closed MVP issues
+- Release tag recorded on closed prototype parent issue
 
 ---
 
-## Stage 6 — Any-format Q&A (post-MVP)
+## Stage 6 — Any-format Q&A (platform)
 
 **Goal:** Cited Q&A for **non-insurance** uploads using the same ingest and chat pipeline.
 
@@ -268,7 +284,7 @@ Stages 0–5 = **insurance MVP (upload).** Stages 6–9 = **cited Q&A platform +
 
 ---
 
-## Stage 7 — Cloud connectors (post-MVP)
+## Stage 7 — Cloud connectors (platform)
 
 **Goal:** Access files **in place** (e.g. Google Drive) for ingest and Q&A without mirroring the user’s entire drive.
 
@@ -289,7 +305,7 @@ See [connectors-and-storage.md](./connectors-and-storage.md).
 
 ---
 
-## Stage 8 — Cross-corpus search (post-MVP)
+## Stage 8 — Cross-corpus search (platform)
 
 **Goal:** **Citation-based search and Q&A** across uploads **and** connected sources — the main platform expansion.
 
@@ -330,7 +346,7 @@ flowchart LR
   S0[0 Foundation] --> S1[1 Document core]
   S1 --> S2[2 Insurance understanding]
   S1 --> S3[3 Cited Q&A]
-  S2 --> S4[4 MVP shell]
+  S2 --> S4[4 Prototype shell]
   S3 --> S4
   S4 --> S5[5 Hardening]
   S5 --> S6[6 Any format]
@@ -348,13 +364,14 @@ Stage 3 can start in parallel with Stage 2 once Stage 1 has chunks (Q&A may use 
 
 **Issues are the source of truth for what to build.** This table is a backlog seed — convert rows to GitHub issues with acceptance criteria; do not implement unissued work.
 
-**Issue structure:** For each minor version, create one **parent release issue** (e.g. `Release v0.1.0 — Insurance MVP`) and attach each row below as a **sub-issue**. See [issue-pr-workflow.md](./issue-pr-workflow.md).
+**Issue structure:** For each minor version, create one **parent release issue** (e.g. `Release v0.1.0 — Prototype: document upload`) and attach each row below as a **sub-issue**. See [issue-pr-workflow.md](./issue-pr-workflow.md) and [product-phases.md](./product-phases.md).
 
-Suggested first batch (MVP) — sub-issues under parent `v0.1.0`:
+Suggested first batch — sub-issues under parent **`v0.1.0` (Prototype: document upload)**:
 
 | Priority | Issue theme | Stage |
 |----------|-------------|-------|
-| P0 | Project skeleton + env loading | 0 |
+| P0 | Go project skeleton + env loading + health check | 0 |
+| P0 | Anonymous session middleware + session-scoped data | 0 |
 | P0 | Upload API + storage + DocumentSource interface | 1 |
 | P0 | PDF text extraction + chunking | 1 |
 | P1 | Image OCR + chunking | 1 |
@@ -371,7 +388,7 @@ Suggested first batch (MVP) — sub-issues under parent `v0.1.0`:
 
 1. **Cite or refuse** — never silent hallucination.  
 2. **Provenance everywhere** — structured values link to document locations.  
-3. **Insurance copy only in MVP surfaces** — generic strings wait for Stage 6+.  
+3. **Insurance copy only in prototype/MVP insurance surfaces** — generic strings wait for Stage 6+.  
 4. **One issue, one PR** — per [issue-pr-workflow.md](./issue-pr-workflow.md).  
 5. **Squash-merge to `develop`; cut `release-*`; tag on release branch** with issue backlinks.
 
@@ -379,12 +396,15 @@ Suggested first batch (MVP) — sub-issues under parent `v0.1.0`:
 
 ## Open decisions (capture in issues as decided)
 
-- Backend language / framework  
 - Vector DB vs pgvector vs sqlite-vec for retrieval  
 - LLM and embedding providers  
-- Auth: session-only MVP vs accounts before first tagged release  
-- Hosting and encryption at rest for uploads  
+- Hosting and encryption at rest for uploads (prototype may stay local)  
 - Connector chunk cache TTL and privacy copy (Stage 7)  
 - When to offer “pin to vault” vs cache-only (Stage 9)  
 
-Do not block Stage 0–1 on perfect answers; block Stage 3 on LLM provider choice. Do not block MVP on Google OAuth.
+**Decided for prototype**
+
+- **Language:** Go  
+- **Auth:** anonymous sessions (cookie/session id; no accounts in `v0.x`)  
+
+Do not block Stage 0–1 on perfect LLM answers; block Stage 3 on LLM provider choice. Do not block prototype on Google OAuth or user accounts.
