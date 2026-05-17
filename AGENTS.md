@@ -290,7 +290,7 @@ Do not file flat issues for release work without a parent when that work belongs
 
 **There is no `main` / `master`.** Integration happens on `develop`; shipped minors live on **`release-*`** branches.
 
-Templates: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md) — **Release parent issue** and **Sub-issue**.
+Templates and **writing conventions** (user stories vs branch vs PR tone): [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).
 
 ### Labels and milestones (required)
 
@@ -343,8 +343,8 @@ gh pr edit <number> --milestone "v0.1.0" --add-label "enhancement"
 
 **Feature / sub-issue PRs → `develop`**
 
-- Branch from `develop`: `issue-<number>-<very-short-description>` (e.g. `issue-3-planning-docs`).
-- PR title: `Issue-<number> - <slightly longer description>`.
+- Branch from `develop`: `issue-<number>-<kebab-slug>` — **technical** slug, not the issue title (e.g. `issue-3-planning-docs`).
+- PR title: `Issue-<number> - <engineering summary>` — may name modules/endpoints; **not** the user-story wording (see issue-pr-workflow **Writing conventions**).
 - **Merge method: squash merge** into `develop`.
 
 **Cutting a release (after sub-issues merged and tested on `develop`):**
@@ -489,8 +489,8 @@ Write issues and PRs as **normal engineering artifacts**: problem, approach, cha
 
 When creating or drafting issues, use the structure in `docs/planning/issue-pr-workflow.md`:
 
-- **Release parent** — minor version milestone + sub-issue checklist + release criteria (no parent/child/planning/PR links in the body — use GitHub **sub-issues**).
-- **Sub-issue** — **Problem**, **Goal**, **Acceptance criteria**, **Out of scope** only. Link to parent via GitHub sub-issues; branch/PR appear under **Development**.
+- **Release parent** — user-facing theme in title; body includes **user story(ies)** + release checklist (see templates).
+- **Sub-issue** — title = **short user need**; body = **`As a … I want … so that …`** + testable **acceptance criteria**. Link to parent via GitHub sub-issues; branch/PR under **Development**. Do not put user stories in PR bodies.
 
 ### Agent process (checklist)
 
@@ -508,7 +508,8 @@ When creating or drafting issues, use the structure in `docs/planning/issue-pr-w
 - [ ] Sub-issue has correct **milestone** (minor version) and **labels**
 - [ ] Note the **parent release issue** for context (do not implement the whole parent in one PR)
 - [ ] Create linked branch: `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop`
-- [ ] PR title: `Issue-<number> - <slightly longer description>` (e.g. `Issue-12 - Add PDF upload endpoint`)
+- [ ] Sub-issue title is **user need**, not implementation; body has user story + acceptance criteria
+- [ ] Branch slug is technical (`issue-<N>-pdf-upload`); PR title is engineering (`Issue-<N> - Add PDF upload endpoint`)
 
 Before opening a PR:
 

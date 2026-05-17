@@ -135,14 +135,104 @@ Squash-merge to `develop` closes the **sub-issue**. The **parent** is tracked vi
 
 ---
 
+## Writing conventions (issues vs branches vs PRs)
+
+Each artifact has a different job. **Do not copy the same sentence** into the issue title, branch name, PR title, and PR body — link them via issue number and `Development`, not duplication.
+
+### What each artifact is for
+
+| Artifact | Audience | Voice | Put here | Do not put here |
+|----------|----------|-------|----------|-----------------|
+| **Parent issue title** | Maintainers, planning | Outcome / release theme | User-visible capability for the minor version | Implementation tasks, file paths, branch names |
+| **Parent issue body** | Same | **Why** for users (epic) | User stories, release checklist, tag/branch metadata | Step-by-step dev tasks, PR links, planning doc URLs |
+| **Sub-issue title** | Same | **Short user need** (≤ ~72 chars) | What the user gains, not how we build it | `Add API`, class names, `issue-12-…` |
+| **Sub-issue body** | Same | **Contract** for the slice | User story, testable acceptance criteria, out of scope | Code design, commit list, duplicate of PR |
+| **Branch name** | Git / CI | **Technical slug** | `issue-<N>-<kebab-slug>` (3–5 words, ASCII, lowercase) | Full user story, spaces, `Release v0.1.0` |
+| **PR title** | Reviewers | **Engineering change** | `Issue-<N> - <what this PR does technically>` | User story preamble, milestone name only |
+| **PR body** | Reviewers | **What shipped in code** | Resolves line, problem/approach, file-level changes, test plan | Full user story, copy-pasted acceptance criteria |
+
+### User stories (parent and sub-issues)
+
+Use the standard form in the **issue body** (not necessarily in the title):
+
+```text
+As a <persona>, I want <goal>, so that <benefit>.
+```
+
+**Personas for Covered**
+
+| Persona | Use when |
+|---------|----------|
+| **policyholder** | MVP insurance features (upload, Q&A, citations) |
+| **contributor** | Repo, CI, docs, agent workflow, release process |
+| **maintainer** | Optional alias for internal tooling; prefer **contributor** for consistency |
+
+**Parent (epic) vs sub-issue (slice)**
+
+| Level | Story scope | Title style |
+|-------|-------------|-------------|
+| **Parent** | Outcome for the **whole minor version** — one or two stories in the body, plus release criteria | `Release v0.1.0 — <user-facing theme>` e.g. `Release v0.1.0 — Ask My Insurance Plan` |
+| **Sub-issue** | **One** negotiable slice a single PR can finish | Short **need**, not implementation: e.g. `Upload insurance PDFs for cited Q&A` not `Add POST /documents` |
+
+**Good sub-issue title (need):** `Upload insurance PDFs for cited Q&A`  
+**Weak (implementation):** `Add PDF upload endpoint` — save that phrasing for the **PR title**.
+
+**Acceptance criteria** — testable from the user’s perspective (or contributor perspective for stage-0 work), not “merge PR” alone:
+
+- Good: `Given an SBC PDF, when I upload it, then it appears in my document list with filename and upload time.`
+- Weak: `Implement upload handler` (belongs in PR **Changes**, not the issue).
+
+**Bugs** — still a user story when it affects product behavior; title can state the defect in plain language:
+
+- Title: `Specialist copay answer cites wrong page`
+- Story: `As a policyholder, I want copay answers to cite the correct page in my SBC, so that I can verify them with my insurer.`
+
+### Branch names
+
+Pattern: `issue-<number>-<slug>`
+
+- **Slug** = kebab-case hint of the **technical** work (for `git branch`, CI, Development link).
+- Derive from the sub-issue, but **shorter and more technical** than the issue title.
+- Examples:
+
+| Sub-issue title (user need) | Branch slug |
+|----------------------------|-------------|
+| Upload insurance PDFs for cited Q&A | `issue-15-pdf-upload` |
+| Add planning documents and workflow to repository | `issue-3-planning-docs` |
+
+### PR titles and bodies
+
+- **Title:** `Issue-<N> - <engineering summary>` — OK to name endpoints, modules, or doc paths here.
+- **Body:** Assume the reader can open the linked issue for the user story. **Summary** = what was wrong / what we did in engineering terms; **Changes** = bullets tied to files or subsystems; **Test plan** = how a reviewer verifies (commands, manual steps).
+
+Do **not** repeat `As a … I want …` in the PR body.
+
+### Minimal example (same work, four surfaces)
+
+| Surface | Example |
+|---------|---------|
+| Sub-issue title | Upload insurance PDFs for cited Q&A |
+| Sub-issue body | As a **policyholder**, I want to upload SBC/EOC PDFs, so that I can ask coverage questions against my real plan. AC: … |
+| Branch | `issue-15-pdf-upload` |
+| PR title | `Issue-15 - Add PDF upload endpoint and document record` |
+| PR body | `- Resolves bmsandoval/covered#15` + Summary / Changes / Test plan (engineering) |
+
+---
+
 ## Release parent issue template
 
-**Title:** `Release v0.1.0 — <short milestone name>`
+**Title:** `Release v0.1.0 — <user-facing theme>` (e.g. `Release v0.1.0 — Ask My Insurance Plan`)
 
 ```markdown
 ## Summary
 
-One paragraph: what this minor version delivers.
+One paragraph: what this minor version delivers **for users** (not how we build it).
+
+## User stories
+
+As a <persona>, I want <goal>, so that <benefit>.
+
+_Add more bullets only if the release truly has multiple distinct outcomes._
 
 ## Target tag
 
@@ -173,21 +263,21 @@ One paragraph: what this minor version delivers.
 
 ## Sub-issue template
 
-**Title:** Short, imperative — e.g. `Add PDF upload endpoint`
+**Title:** Short **user need** — e.g. `Upload insurance PDFs for cited Q&A` (not `Add PDF upload endpoint`)
 
 ```markdown
-## Problem
+## User story
 
-…
+As a <persona>, I want <goal>, so that <benefit>.
 
-## Goal
+## Context
 
-…
+_Optional: why now, constraint, or link to stage — keep brief._
 
 ## Acceptance criteria
 
+- [ ] _Testable, user-visible (Given/When/Then or clear checklist)_
 - [ ] …
-- [ ] PR **squash-merged** to `develop`
 
 ## Out of scope
 
@@ -200,9 +290,9 @@ Link the sub-issue to its parent in GitHub (**sub-issues** under the parent). Do
 
 ## Pull request template
 
-**Branch name:** `issue-<number>-<very-short-description>`
+**Branch name:** `issue-<number>-<kebab-slug>` — technical, 3–5 words (see **Writing conventions**)
 
-**PR title:** `Issue-<number> - <slightly longer description>`
+**PR title:** `Issue-<number> - <engineering summary>` — what this PR does in code/docs (may differ from issue title)
 
 **Base branch:** `develop` (features) or `release-X-Y-Z` (hotfixes only)
 
@@ -213,7 +303,7 @@ Link the sub-issue to its parent in GitHub (**sub-issues** under the parent). Do
 
 ## Summary
 
-<Problem in 1–2 sentences.>
+<Engineering problem in 1–2 sentences — do not repeat the issue user story.>
 
 <Approach in 1–2 sentences.>
 
