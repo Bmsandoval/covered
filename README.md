@@ -103,6 +103,9 @@ There is **no `main` / `master`**.
 ```bash
 cp ex.env local.env
 # Edit local.env (SESSION_SECRET, keys when wired)
+
+go run ./cmd/covered
+curl -s http://localhost:8080/health
 ```
 
 ## Status
