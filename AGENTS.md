@@ -226,7 +226,7 @@ Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All 
 
 | Level | Purpose | PRs? |
 |-------|---------|------|
-| **Parent** | Release milestone — scope, release checklist, target tag | Rarely (e.g. `develop` → `main` promotion may `Refs` parent) |
+| **Parent** | Release milestone — scope, release checklist, target tag | Rarely (e.g. cut `release-X-Y-Z` or backmerge may `Refs` parent) |
 | **Sub-issue** | One deliverable slice — what agents implement day to day | **Yes** — one sub-issue per branch/PR |
 
 **When creating a release batch (with maintainer):**
@@ -235,9 +235,11 @@ Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All 
 2. Create **sub-issues** for each part; attach them as **sub-issues** of the parent in GitHub.
 3. Prioritize and implement **sub-issues only** — one at a time.
 4. PRs use `Closes #N` on the **sub-issue**, not the parent (unless the PR is explicitly release-wide).
-5. When all sub-issues are done, we test on `develop`, promote to `main`, tag (e.g. `v0.1.0`), record the tag on the **parent**, then **close the parent**.
+5. When all sub-issues are done, we test on `develop`, **cut a release branch** from `develop`, tag on that branch (e.g. `v0.1.0`), record the tag on the **parent**, then **close the parent**.
 
 Do not file flat issues for release work without a parent when that work belongs to a planned minor version.
+
+**There is no `main` / `master`.** Integration happens on `develop`; shipped minors live on **`release-*`** branches.
 
 Templates: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md) — **Release parent issue** and **Sub-issue**.
 
@@ -282,15 +284,54 @@ gh pr edit <number> --milestone "v0.1.0" --add-label "enhancement"
 
 ### Branches and merges
 
-| Branch | Use |
-|--------|-----|
-| `develop` | Default target for all PRs |
-| `main` | Minor releases only, after joint testing on `develop` |
+**No `main` or `master`.** This repo uses **`develop`** plus **release branches** cut from it.
 
-- **Branch name:** `issue-<number>-<very-short-description>` (e.g. `issue-3-planning-docs`).
-- **PR title:** `Issue-<number> - <slightly longer description>` (e.g. `Issue-3 - Add planning documents and workflow`).
+| Branch | Pattern | Purpose |
+|--------|---------|---------|
+| `develop` | — | Integration line — all feature/fix work lands here first |
+| `release-X-Y-Z` | e.g. `release-0-0-0`, `release-0-1-0` | Shipped minor version; receives hotfixes only after cut |
+
+**Feature / sub-issue PRs → `develop`**
+
+- Branch from `develop`: `issue-<number>-<very-short-description>` (e.g. `issue-3-planning-docs`).
+- PR title: `Issue-<number> - <slightly longer description>`.
+- **Merge method: squash merge** into `develop`.
+
+**Cutting a release (after sub-issues merged and tested on `develop`):**
+
+```bash
+git checkout develop && git pull
+git checkout -b release-0-1-0
+git push -u origin release-0-1-0
+git tag -a v0.1.0 -m "v0.1.0"
+git push origin v0.1.0
+```
+
+Use the minor version in the branch name (`release-0-0-0` for `v0.0.0`) and matching git tag.
+
+**Hotfixes / patches on a shipped release:**
+
+1. Branch from the **release branch** (e.g. `release-0-1-0`), not from `develop`.
+2. Open PR **into that release branch**.
+3. **Squash merge** into the release branch.
+4. **Backmerge** release → `develop` with a **regular merge** (merge commit), not squash — so `develop` picks up the patch.
+5. Tag a patch release on the release branch if applicable (e.g. `v0.1.1`).
+
+**Release branch must not stay ahead of `develop`.** Patches on `release-*` must be **backmerged** into `develop` promptly. `develop` is the forward line; release branches are cut points plus patch lines that flow back.
+
+**v0.0.0 dry run:** work **squash-merges to `develop` only** first; cutting `release-0-0-0` from `develop` is a later step in the same dry run (after merge and test).
+
+**PR targets by work type:**
+
+| Work | PR base | Merge into base |
+|------|---------|-----------------|
+| Sub-issue / feature | `develop` | **Squash** |
+| Hotfix on shipped release | `release-X-Y-Z` | **Squash** |
+| Backmerge after hotfix | `develop` | **Merge** (regular) |
+
+Do not open feature PRs directly into `release-*` unless it is a hotfix for that release.
+
 - **Link the branch on the sub-issue** so it appears under **Development** (see below).
-- Open PRs **into `develop`**, never into `main`, unless explicitly instructed for a release promotion PR.
 
 ### Link branches in the issue Development section (required)
 
@@ -313,8 +354,6 @@ This creates the branch **already linked** in **Development**. Do **not** use `c
 **After opening a PR:** `Closes #N` links the PR in Development; the branch may be hidden once the PR is open — that is normal. If neither branch nor PR appears, fix linking before merge.
 
 **Agents:** If you cannot run `gh issue develop` (no auth / API scope), **comment on the sub-issue** with the exact branch name and remind the maintainer to use **Development → Link a branch**, or to run `gh issue develop` locally.
-- **Minor releases:** merge `develop` → `main` only after we have tested the release batch together on `develop`.
-- **Tag** each release commit on `main` (e.g. `v0.2.0`) and record that tag on the related issue(s).
 
 ### Issue ↔ PR linking (required)
 
@@ -408,10 +447,13 @@ Before opening a PR:
 - [ ] PR has same **milestone** as sub-issue and matching **labels** (`gh pr edit …`)
 - [ ] Issue commented with PR link
 
-Before considering work “released”:
+Before considering a minor version “released”:
 
-- [ ] Tested on `develop` with maintainer per release batch
-- [ ] Release tagged on `main`; tag noted on issue
+- [ ] All sub-issues squash-merged to `develop`
+- [ ] Tested on `develop` with maintainer
+- [ ] `release-X-Y-Z` cut from `develop` and pushed
+- [ ] Tag (e.g. `v0.1.0`) on **release branch**; tag noted on parent issue
+- [ ] Any release-branch hotfixes backmerged to `develop` (regular merge)
 
 ## Repository conventions
 

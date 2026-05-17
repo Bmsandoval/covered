@@ -121,7 +121,7 @@ Stages 0–5 = **insurance MVP (upload).** Stages 6–9 = **cited Q&A platform +
 
 - Application skeleton (API + optional web shell)
 - Load config from `local.env` / `ex.env`
-- `develop` / `main` branch usage documented and used
+- `develop` + release-branch workflow documented and used (no `main`/`master`)
 - Health check or “hello” endpoint
 - Basic CI (lint/test) when code exists
 
@@ -230,7 +230,7 @@ Stages 0–5 = **insurance MVP (upload).** Stages 6–9 = **cited Q&A platform +
 
 ## Stage 5 — MVP hardening
 
-**Goal:** Trustworthy enough to dogfood and tag a minor release on `main`.
+**Goal:** Trustworthy enough to dogfood, cut a release branch, and tag a minor version.
 
 **Deliverables**
 
@@ -239,7 +239,7 @@ Stages 0–5 = **insurance MVP (upload).** Stages 6–9 = **cited Q&A platform +
 - OCR/PDF failure handling (user-visible)
 - Logging for retrieval misses and low-confidence answers
 - Security pass: no secrets in repo, upload limits, local data paths documented
-- Release `v0.x.0` on `main` after joint test on `develop`
+- Cut `release-0-x-0` from `develop` and tag `v0.x.0` on release branch after joint test on `develop`
 
 **Success criteria**
 
@@ -373,7 +373,7 @@ Suggested first batch (MVP) — sub-issues under parent `v0.1.0`:
 2. **Provenance everywhere** — structured values link to document locations.  
 3. **Insurance copy only in MVP surfaces** — generic strings wait for Stage 6+.  
 4. **One issue, one PR** — per [issue-pr-workflow.md](./issue-pr-workflow.md).  
-5. **Merge to `develop`; release to `main`** with tags and issue backlinks.
+5. **Squash-merge to `develop`; cut `release-*`; tag on release branch** with issue backlinks.
 
 ---
 
@@ -382,7 +382,7 @@ Suggested first batch (MVP) — sub-issues under parent `v0.1.0`:
 - Backend language / framework  
 - Vector DB vs pgvector vs sqlite-vec for retrieval  
 - LLM and embedding providers  
-- Auth: session-only MVP vs accounts before `main` release  
+- Auth: session-only MVP vs accounts before first tagged release  
 - Hosting and encryption at rest for uploads  
 - Connector chunk cache TTL and privacy copy (Stage 7)  
 - When to offer “pin to vault” vs cache-only (Stage 9)  

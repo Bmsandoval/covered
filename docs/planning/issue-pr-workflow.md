@@ -4,20 +4,54 @@ Canonical templates for GitHub issues and pull requests. Agents must follow [AGE
 
 ## Branching and releases
 
-| Branch | Role |
-|--------|------|
-| `develop` | Integration branch — **all PRs merge here** |
-| `main` | Stable line — receives **minor releases** after we test together on `develop` |
+**No `main` or `master`.** Only **`develop`** and **`release-*`** branches.
 
-**Release flow**
+| Branch | Purpose |
+|--------|---------|
+| `develop` | Integration — all sub-issue PRs **squash-merge** here |
+| `release-X-Y-Z` | Shipped minor (e.g. `release-0-0-0` for `v0.0.0`) — cut from `develop`; hotfixes land here |
 
-1. Work lands on `develop` via issue-linked PRs.
-2. We test the batch on `develop` together before promoting.
-3. Merge `develop` → `main` for a minor release.
-4. Tag the release commit on `main` (e.g. `v0.2.0`).
-5. Update the related issue(s) with the release tag and close if complete.
+```mermaid
+flowchart TB
+  subgraph daily [Day to day]
+    F[issue-N branch] -->|squash PR| D[develop]
+  end
+  subgraph release [Release]
+    D -->|cut branch| R[release-0-1-0]
+    R -->|tag| T[v0.1.0]
+  end
+  subgraph hotfix [Hotfix]
+    H[hotfix branch] -->|squash PR| R
+    R -->|regular merge backmerge| D
+  end
+```
 
-Do not merge unreviewed work directly to `main`. Do not skip joint testing for minor releases.
+### Release flow
+
+1. Sub-issues merge to **`develop`** via **squash** PRs.
+2. Test together on **`develop`**.
+3. Cut **`release-X-Y-Z`** from `develop` (e.g. `release-0-0-0`).
+4. Tag on the **release branch** (e.g. `v0.0.0`).
+5. Update parent issue with tag; close parent when done.
+
+**v0.0.0 dry run:** squash-merge planning work to `develop` first; cut `release-0-0-0` later in the dry run.
+
+### Hotfix flow
+
+1. Branch from **`release-X-Y-Z`** (not `develop`).
+2. **Squash merge** PR into the release branch.
+3. **Regular merge** (backmerge) `release-X-Y-Z` → `develop` so patches are not lost.
+4. Tag patch on release branch if needed (`v0.1.1`).
+
+**Rule:** A release branch must **not** remain ahead of `develop` — backmerge after every hotfix.
+
+### Merge methods (required)
+
+| PR type | Base branch | Merge method |
+|---------|-------------|--------------|
+| Sub-issue / feature | `develop` | **Squash** |
+| Hotfix | `release-X-Y-Z` | **Squash** |
+| Backmerge | `develop` | **Merge** (regular merge commit) |
 
 ---
 
@@ -37,33 +71,18 @@ flowchart TB
   P --> S1
   P --> S2
   P --> S3
-  S1 --> PR1[PR → develop]
-  S2 --> PR2[PR → develop]
-  S3 --> PR3[PR → develop]
+  S1 --> PR1[squash PR → develop]
+  S2 --> PR2[squash PR → develop]
+  S3 --> PR3[squash PR → develop]
 ```
 
 **Rules**
 
-- Create the **parent first**, then sub-issues; link sub-issues to the parent using GitHub **sub-issues** (Issues → parent → add sub-issue).
+- Create the **parent first**, then sub-issues; link sub-issues to the parent using GitHub **sub-issues**.
 - Agents implement **sub-issues only** — one sub-issue per branch/PR.
-- **Link every working branch** on the sub-issue (**Development** sidebar) before or right after the first push.
-- PRs **`Closes #N`** the **sub-issue** number.
-- Close the **parent** only after: all sub-issues closed, joint test on `develop`, merge to `main`, git tag pushed, tag recorded on parent.
-
-### Link branch to sub-issue (Development section)
-
-GitHub only shows work on the issue when the branch (and/or PR) is linked under **Development**.
-
-**Create linked branch (recommended):**
-
-```bash
-git checkout develop && git pull
-gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --checkout --base develop
-```
-
-**Branch already pushed but not linked:** On the sub-issue → **Development** → **Link a branch** → select e.g. `issue-3-planning-docs`.
-
-**Verify:** Issue sidebar **Development** lists the branch; after PR open, the PR should appear (branch may be folded into PR — OK).
+- **Link every working branch** on the sub-issue (**Development** sidebar).
+- PRs **`Closes #N`** the **sub-issue**; **squash merge** into `develop`.
+- Close the **parent** after: all sub-issues closed, test on `develop`, `release-X-Y-Z` cut, tag pushed, tag on parent.
 
 ### Labels and milestones (required)
 
@@ -89,50 +108,57 @@ gh pr edit <pr> --milestone "v0.0.0" --add-label "documentation,planning"
 
 **Stage labels:** `stage:0` … `stage:9` aligned with [staged-solution-plan.md](./staged-solution-plan.md).
 
+### Link branch to sub-issue (Development section)
+
+**Create linked branch (recommended):**
+
+```bash
+git checkout develop && git pull
+gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --checkout --base develop
+```
+
+**Branch already pushed:** sub-issue → **Development** → **Link a branch**.
+
 ---
 
 ## Release parent issue template
 
-**Title:** `Release v0.1.0 — <short milestone name>`  
-Example: `Release v0.1.0 — Insurance MVP`
+**Title:** `Release v0.1.0 — <short milestone name>`
 
 ```markdown
 ## Summary
 
-One paragraph: what this minor version delivers and why it exists.
+One paragraph: what this minor version delivers.
 
 ## Target tag
 
 `v0.1.0`
 
+## Release branch
+
+`release-0-1-0` (cut from `develop` after sub-issues merge and test)
+
 ## Sub-issues
 
-Create these as sub-issues of this parent (check off as filed):
-
-- [ ] #__ — <title>
-- [ ] #__ — <title>
 - [ ] #__ — <title>
 
 ## Release acceptance criteria
 
-- [ ] All sub-issues closed
-- [ ] Tested together on `develop` (see test notes below)
-- [ ] `develop` merged to `main`
-- [ ] Tag `v0.1.0` on `main` and pushed
-- [ ] Release notes / tag recorded here
+- [ ] All sub-issues closed (squash-merged to `develop`)
+- [ ] Tested on `develop`
+- [ ] `release-0-1-0` cut from `develop` and pushed
+- [ ] Tag `v0.1.0` on release branch and pushed
+- [ ] Tag recorded on this issue
 
 ## Test plan (release batch)
 
-- [ ] End-to-end scenario 1
-- [ ] End-to-end scenario 2
+- [ ] …
 
 ## Links
 
 - Planning: `docs/planning/staged-solution-plan.md`
-- Tag: (fill after release — e.g. `v0.1.0`)
+- Tag: _(fill after release)_
 ```
-
-**Parent issues do not usually get implementation PRs** — only sub-issues do. Exception: a dedicated “Promote v0.1.0 to main” PR may `Refs` the parent.
 
 ---
 
@@ -143,138 +169,70 @@ Create these as sub-issues of this parent (check off as filed):
 ```markdown
 ## Parent release
 
-Part of **Release v0.1.0** — #<parent_issue_number>
+Part of **Release v0.1.0** — #<parent>
 
 ## Problem
 
-One or two sentences: what user or system pain exists, and why it matters now.
+…
 
 ## Goal
 
-One sentence: what “done” looks like from the user’s perspective.
+…
 
 ## Acceptance criteria
 
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
-
-## Approach (optional)
-
-Broad technical direction if already agreed — not a full design doc.
+- [ ] …
+- [ ] PR **squash-merged** to `develop`
 
 ## Out of scope
 
-- Thing we are explicitly not doing in this issue
+- …
 
 ## Links
 
 - Parent: https://github.com/Bmsandoval/covered/issues/<parent>
-- Planning: `docs/planning/...` (if any)
-- PR: (add when opened — `https://github.com/Bmsandoval/covered/pull/N`)
+- PR: …
 ```
-
-### Example sub-issue
-
-**Title:** Load configuration from `local.env` in development  
-**Parent:** Release v0.1.0 — #1
-
-## Problem
-
-The app has no standard way to read settings locally; developers need a single, documented env source before we add a database or LLM keys.
-
-## Goal
-
-The server starts in development using variables from `local.env` with clear errors when required keys are missing.
-
-## Acceptance criteria
-
-- [ ] `ex.env` documents all keys; `local.env` is gitignored
-- [ ] Dev entrypoint loads `local.env`
-- [ ] Missing required keys produce a actionable error message
-
-## Out of scope
-
-- Production secret manager integration
-- Per-environment config UI
-
-## Links
-
-- Parent: https://github.com/Bmsandoval/covered/issues/1
-- PR: https://github.com/Bmsandoval/covered/pull/12
 
 ---
 
 ## Pull request template
 
-**Branch name:** `issue-<number>-<very-short-description>` — e.g. `issue-12-local-env-config`
+**Branch name:** `issue-<number>-<very-short-description>`
 
-**PR title:** `Issue-<number> - <slightly longer description>` — e.g. `Issue-12 - Load dev config from local.env`
+**PR title:** `Issue-<number> - <slightly longer description>`
 
-**Title (optional subtitle):** May mirror PR title; include `(#N)` if helpful — e.g. `Load dev config from local.env (#12)`
+**Base branch:** `develop` (features) or `release-X-Y-Z` (hotfixes only)
 
-**Body:**
+**Merge:** **Squash** (features and hotfixes); **regular merge** for backmerge PRs only.
 
 ```markdown
-Closes #12
+Closes #N
 
 ## Summary
 
-<1–2 sentences: the problem being solved.>
+<Problem in 1–2 sentences.>
 
-<1–2 sentences: broadly what we are doing to solve it.>
-
-## Changes
-
-- Bullet: concrete change 1
-- Bullet: concrete change 2
-- Bullet: tests or docs updated
-
-## Test plan
-
-- [ ] How we verified (or how the reviewer should verify)
-
-## Issue
-
-- https://github.com/Bmsandoval/covered/issues/12
-```
-
-Use `Closes #N` when the PR fully completes the issue (auto-closes on merge). Use `Refs #N` only for partial work that leaves the issue open.
-
-### Example PR
-
-**Title:** Load dev config from `local.env` (#12)
-
-```markdown
-Closes #12
-
-## Summary
-
-Developers had no shared way to inject API keys and ports locally, which blocked standing up ingestion and chat spikes.
-
-This PR adds a small config loader that reads `local.env` in development and validates required keys at startup.
+<Approach in 1–2 sentences.>
 
 ## Changes
 
-- Add `config` package that loads `local.env` when `APP_ENV=development`
-- Document keys in `ex.env`; fail fast with missing-key messages
-- Add unit tests for load and validation paths
+- …
 
 ## Test plan
 
-- [ ] `cp ex.env local.env`, set `APP_PORT`, run server — listens on configured port
-- [ ] Remove required key — startup prints clear error
+- [ ] …
 
 ## Issue
 
-- https://github.com/Bmsandoval/covered/issues/12
+- https://github.com/Bmsandoval/covered/issues/N
 ```
 
 ---
 
 ## No tool branding
 
-Do **not** include “Made with Cursor”, “AI-generated”, Copilot/Claude co-author trailers, or similar in issue titles, issue bodies, PR descriptions, commit messages, or release notes. See [AGENTS.md](../../AGENTS.md).
+Do **not** include “Made with Cursor”, “AI-generated”, or similar in issues, PRs, commits, or release notes. See [AGENTS.md](../../AGENTS.md).
 
 ---
 
@@ -282,29 +240,31 @@ Do **not** include “Made with Cursor”, “AI-generated”, Copilot/Claude co
 
 **When creating a minor version**
 
-- [ ] Milestone created for minor version (e.g. `v0.1.0`)
-- [ ] Parent release issue created with target tag (e.g. `v0.1.0`), milestone, label `release`
-- [ ] Sub-issues created and attached to parent in GitHub; same milestone + labels
-- [ ] Parent body lists all sub-issue numbers
+- [ ] Milestone created (e.g. `v0.0.0`)
+- [ ] Parent issue + milestone + `release` label
+- [ ] Sub-issues linked as sub-issues of parent; same milestone + labels
 
 **When starting work (sub-issue)**
 
-- [ ] Branch created with `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop`, **or** existing branch linked via **Development → Link a branch**
-- [ ] Branch visible on sub-issue **Development** before or immediately after first push
+- [ ] Linked branch on **Development** (`gh issue develop` or manual link)
+- [ ] Branch from `develop`
 
 **When opening a PR (sub-issue)**
 
-- [ ] PR targets **sub-issue** with `Closes #N`
-- [ ] Body includes full sub-issue URL under **Issue**
-- [ ] Comment on **sub-issue** with PR link (backlink)
-- [ ] PR appears under **Development** on the sub-issue
-- [ ] PR has same **milestone** and **labels** as sub-issue (`gh pr edit …`)
-- [ ] Optional: comment on **parent** with progress note when a major sub-issue merges
+- [ ] Base: **`develop`**
+- [ ] Merge method: **squash**
+- [ ] `Closes #N`, issue URL, backlink comment
+- [ ] Milestone and labels on PR
 
 **When releasing**
 
-- [ ] All sub-issues for the parent are closed
-- [ ] Joint test on `develop` completed
-- [ ] Tag on `main`: `git tag -a v0.1.0 -m "..."` && push tag
-- [ ] Add tag to **parent** issue **Links** section
-- [ ] Close **parent** release issue
+- [ ] All sub-issues squash-merged to `develop`
+- [ ] Test on `develop`
+- [ ] Cut `release-X-Y-Z` from `develop`
+- [ ] Tag on release branch; note on parent; close parent
+
+**When hotfixing a release**
+
+- [ ] PR into `release-X-Y-Z` — squash merge
+- [ ] Backmerge `release-X-Y-Z` → `develop` — **regular merge**
+- [ ] Release branch not left ahead of `develop`

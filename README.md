@@ -93,16 +93,18 @@ We build in small, reviewable slices tied to GitHub issues.
 
 | Branch | Purpose |
 |--------|---------|
-| [`develop`](https://github.com/Bmsandoval/covered/tree/develop) | Day-to-day integration — **open PRs here** |
-| [`main`](https://github.com/Bmsandoval/covered/tree/main) | Stable minor releases after we test together |
+| [`develop`](https://github.com/Bmsandoval/covered/tree/develop) | Integration — sub-issue PRs **squash-merge** here |
+| `release-X-Y-Z` (e.g. `release-0-0-0`) | Cut from `develop` per minor; hotfixes squash here, then **backmerge** to `develop` |
+
+There is **no `main` / `master`**.
 
 **Workflow (short):**
 
-1. Each minor version has a **parent release issue** with **sub-issues** for the parts; work **one sub-issue** at a time.
-2. Branch from `develop`, implement, open a PR back to `develop`.
-3. Link the issue on the PR (`Closes #N` + issue URL) and **comment the PR link on the issue**.
-4. PR description: a few sentences on the problem and approach, then **bullets** for what changed.
-5. Batch test on `develop`; promote minor releases to `main`, **tag** the release (e.g. `v0.2.0`), and note the tag on the issue.
+1. Each minor version has a **parent release issue** with **sub-issues**; work **one sub-issue** at a time.
+2. Branch from `develop` → PR to `develop` → **squash merge**.
+3. Link the issue on the PR (`Closes #N`) and **comment the PR link on the issue**.
+4. Test on `develop`; cut **`release-0-1-0`** (etc.) from `develop`; **tag** on the release branch (e.g. `v0.1.0`).
+5. Hotfixes: branch from `release-*` → squash to release → **regular merge** back to `develop`.
 
 Templates and examples: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).  
 Agent and contributor rules: [AGENTS.md](./AGENTS.md).
