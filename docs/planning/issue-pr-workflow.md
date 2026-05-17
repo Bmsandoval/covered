@@ -125,7 +125,11 @@ gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --check
 
 ```text
 Resolves bmsandoval/covered#<sub> (https://github.com/Bmsandoval/covered/issues/<sub>)
+
+- #<sub>
 ```
+
+Line 1 closes the sub-issue on squash-merge. Line 2 (`- #<sub>`) is a **list item** so GitHub **unfurls** the issue (title + state). Plain `#<sub>` outside a list only renders as a short link.
 
 Squash-merge to `develop` closes the **sub-issue**. The **parent** is tracked via GitHub **sub-issue** relationships and closed manually when the release ships. Link branch/PR on the **sub-issue** Development panel (no parent/PR/planning links needed in issue bodies).
 
@@ -208,6 +212,8 @@ Link the sub-issue to its parent in GitHub (**sub-issues** under the parent). Do
 
 ```markdown
 Resolves bmsandoval/covered#<sub> (https://github.com/Bmsandoval/covered/issues/<sub>)
+
+- #<sub>
 
 ## Summary
 

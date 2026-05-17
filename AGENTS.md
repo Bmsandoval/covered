@@ -416,7 +416,11 @@ Example (sub-issue #3):
 
 ```text
 Resolves bmsandoval/covered#3 (https://github.com/Bmsandoval/covered/issues/3)
+
+- #3
 ```
+
+**GitHub rendering:** The first line closes the issue on squash-merge. The **bullet on the next line** (`- #3`) triggers the **expanded issue card** (title + state) in the PR body. A bare `#3` on a non-list line only shows as a short link; a full URL in parentheses on the same line as `Resolves` also shortens to `#3` — use the list line for the fancy card.
 
 - **Sub-issue** — the slice you implemented (branch `issue-<sub>-…`, Development panel shows branch/PR).
 - **Parent** — linked as a **sub-issue** in GitHub; do **not** reference it in the PR body. Close the parent manually when the release ships.
@@ -466,6 +470,8 @@ Write issues and PRs as **normal engineering artifacts**: problem, approach, cha
 
 ```markdown
 Resolves bmsandoval/covered#<sub> (https://github.com/Bmsandoval/covered/issues/<sub>)
+
+- #<sub>
 
 ## Summary
 
