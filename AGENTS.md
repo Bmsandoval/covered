@@ -333,35 +333,44 @@ Do not open feature PRs directly into `release-*` unless it is a hotfix for that
 
 - **Link the branch on the sub-issue** so it appears under **Development** (see below).
 
-### Link branches in the issue Development section (required)
+### Link branches and PRs in Development (required)
 
-GitHub’s issue **Development** sidebar must show the working branch (and then the PR). **Every sub-issue** you implement must have its branch linked there.
+GitHub’s **Development** sidebar on the **sub-issue** (not the parent release issue) must show the branch and/or PR.
 
-**Preferred — create a linked branch with `gh` (use before first commit):**
+**Order matters — do not push an unlinked branch first.**
 
-```bash
-git checkout develop && git pull
-gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --checkout --base develop
-```
+1. `git checkout develop && git pull`
+2. `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` — **before any commit**
+3. Commit, push, open PR
+4. Verify Development shows branch and/or PR (see below)
 
-This creates the branch **already linked** in **Development**. Do **not** use `createLinkedBranch` GraphQL on an existing branch — it may create a duplicate auto-named branch. Always pass `--name issue-<N>-<slug>` to match our convention.
+**Never** use GraphQL `createLinkedBranch` on an existing branch — GitHub creates a **new auto-named branch** (e.g. `3-add-planning-…`), not `issue-3-planning-docs`, and the real branch stays unlinked.
 
-**If the branch already exists locally and was pushed:**
+**If the branch was already pushed without linking:**
 
-1. On the sub-issue: **Development** → **Link a branch** → choose the remote branch (e.g. `issue-3-planning-docs`), **or**
-2. After `gh auth login`, recreate via `gh issue develop` with `--name` matching the existing branch (only if not linked yet).
+- Sub-issue → **Development** → **Link a branch** → select `issue-<N>-<slug>` on the remote.
 
-**After opening a PR:** `Closes #N` links the PR in Development; the branch may be hidden once the PR is open — that is normal. If neither branch nor PR appears, fix linking before merge.
+`gh issue develop` cannot attach a branch that already exists on the remote (API error). Manual link or a new linked branch name is required.
 
-**Agents:** If you cannot run `gh issue develop` (no auth / API scope), **comment on the sub-issue** with the exact branch name and remind the maintainer to use **Development → Link a branch**, or to run `gh issue develop` locally.
+**Parent release issues (#2, etc.)** do not get branches — only **sub-issues** do.
 
 ### Issue ↔ PR linking (required)
 
 **On every PR:**
 
-1. Include `Closes #N` (or `Refs #N` if the issue stays open) in the PR body.
-2. Add a full issue URL in the PR body (see template below).
+1. First lines of the PR body must include **both**:
+   - `Closes #N`
+   - `Fixes https://github.com/Bmsandoval/covered/issues/N` (full URL — required for Development to show the PR)
+2. Add the issue URL again under **Issue** (see template below).
 3. **Backlink:** comment on the issue with the PR URL when the PR is opened or updated.
+
+**Verify PR appears on the issue** (maintainer or agent with `gh`):
+
+```bash
+gh api graphql -f query='query { repository(owner:"Bmsandoval",name:"covered") { issue(number:N) { closedByPullRequestsReferences(first:5) { nodes { number } } linkedBranches(first:5) { nodes { ref { name } } } } } }'
+```
+
+Expect `closedByPullRequestsReferences` and/or `linkedBranches` populated. If empty after opening the PR, add the full `Fixes https://…/issues/N` URL and re-check.
 
 **On every completed release:**
 

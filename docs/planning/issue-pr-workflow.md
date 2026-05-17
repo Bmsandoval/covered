@@ -108,16 +108,21 @@ gh pr edit <pr> --milestone "v0.0.0" --add-label "documentation,planning"
 
 **Stage labels:** `stage:0` … `stage:9` aligned with [staged-solution-plan.md](./staged-solution-plan.md).
 
-### Link branch to sub-issue (Development section)
+### Link branch and PR (Development section)
 
-**Create linked branch (recommended):**
+**Before the first commit** (required):
 
 ```bash
 git checkout develop && git pull
 gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --checkout --base develop
+# commit, push, then open PR
 ```
 
-**Branch already pushed:** sub-issue → **Development** → **Link a branch**.
+**Branch already on remote without link:** sub-issue → **Development** → **Link a branch** → `issue-<N>-<slug>`. Do not use GraphQL `createLinkedBranch` (wrong branch name).
+
+**PR must include** `Closes #N` and `Fixes https://github.com/Bmsandoval/covered/issues/N` at the top of the body so the PR shows under Development.
+
+**Parent release issues** do not show branches — link work on **sub-issues** only.
 
 ---
 
@@ -208,6 +213,7 @@ Part of **Release v0.1.0** — #<parent>
 
 ```markdown
 Closes #N
+Fixes https://github.com/Bmsandoval/covered/issues/N
 
 ## Summary
 
