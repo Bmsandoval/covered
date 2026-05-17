@@ -81,7 +81,7 @@ flowchart TB
 - Create the **parent first**, then sub-issues; link sub-issues to the parent using GitHub **sub-issues**.
 - Agents implement **sub-issues only** — one sub-issue per branch/PR.
 - **Link every working branch** on the sub-issue (**Development** sidebar).
-- PRs **`Closes #N`** the **sub-issue**; **squash merge** into `develop`.
+- PRs **implement** the **sub-issue** (`Implements` line in body); **squash merge** into `develop`.
 - Close the **parent** after: all sub-issues closed, test on `develop`, `release-X-Y-Z` cut, tag pushed, tag on parent.
 
 ### Labels and milestones (required)
@@ -120,7 +120,7 @@ gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --check
 
 **Branch already on remote without link:** sub-issue → **Development** → **Link a branch** → `issue-<N>-<slug>`. Do not use GraphQL `createLinkedBranch` (wrong branch name).
 
-**PR must include** `Closes #N` and `Fixes https://github.com/Bmsandoval/covered/issues/N` at the top of the body so the PR shows under Development.
+**PR must start with** `Implements https://github.com/Bmsandoval/covered/issues/N`. Link the PR on the sub-issue **Development** panel if it does not appear automatically (GitHub does not treat `Implements` as a closing keyword).
 
 **Parent release issues** do not show branches — link work on **sub-issues** only.
 
@@ -212,8 +212,7 @@ Part of **Release v0.1.0** — #<parent>
 **Merge:** **Squash** (features and hotfixes); **regular merge** for backmerge PRs only.
 
 ```markdown
-Closes #N
-Fixes https://github.com/Bmsandoval/covered/issues/N
+Implements https://github.com/Bmsandoval/covered/issues/N
 
 ## Summary
 
@@ -259,7 +258,7 @@ Do **not** include “Made with Cursor”, “AI-generated”, or similar in iss
 
 - [ ] Base: **`develop`**
 - [ ] Merge method: **squash**
-- [ ] `Closes #N`, issue URL, backlink comment
+- [ ] `Implements` line, issue URL, backlink comment; PR linked under **Development**
 - [ ] Milestone and labels on PR
 
 **When releasing**
