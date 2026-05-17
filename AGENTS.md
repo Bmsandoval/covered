@@ -226,16 +226,17 @@ Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All 
 
 | Level | Purpose | PRs? |
 |-------|---------|------|
-| **Parent** | Release milestone — scope, release checklist, target tag | Rarely (e.g. cut `release-X-Y-Z` or backmerge may `Refs` parent) |
-| **Sub-issue** | One deliverable slice — what agents implement day to day | **Yes** — one sub-issue per branch/PR |
+| **Parent** | Release milestone — scope, release checklist, target tag | Closed when work is **squash-merged to `develop`** (tested) |
+| **Sub-issue** | One deliverable slice or bug fix — what agents implement day to day | **Yes** — one sub-issue per branch/PR |
 
 **When creating a release batch (with maintainer):**
 
 1. Create the **parent issue** first (title e.g. `Release v0.1.0 — Insurance MVP`).
 2. Create **sub-issues** for each part; attach them as **sub-issues** of the parent in GitHub.
 3. Prioritize and implement **sub-issues only** — one at a time.
-4. PRs use **`Resolves bmsandoval/covered#N`** on the **sub-issue**, not the parent (unless the PR is explicitly release-wide).
-5. When all sub-issues are done, we test on `develop`, **cut a release branch** from `develop`, tag on that branch (e.g. `v0.1.0`), record the tag on the **parent**, then **close the parent**.
+4. **Bug fixes** found during testing → always a **new sub-issue** under the same parent (never bundled into an unrelated sub-issue PR).
+5. PRs to `develop` use **`Resolves`** for **both** the **sub-issue** and the **parent** (see below) — squash-merge means the work was tested on `develop`.
+6. When all sub-issues are closed and the release batch is tested on `develop`, **cut a release branch**, tag (e.g. `v0.1.0`), record the tag on the **parent**.
 
 Do not file flat issues for release work without a parent when that work belongs to a planned minor version.
 
@@ -281,6 +282,7 @@ gh pr edit <number> --milestone "v0.1.0" --add-label "enhancement"
 - The **sub-issue is the execution contract**; planning docs do not override its acceptance criteria.
 - Issues are created and **prioritized with the maintainer**; do not invent priority or pull in lower-priority work without agreement.
 - If scope grows, **split a new sub-issue** under the same release parent instead of expanding the current one.
+- **Bugs found while testing** → **new sub-issue** under the parent; do not patch drive-by on another sub-issue’s branch.
 
 ### Branches and merges
 
@@ -356,31 +358,35 @@ GitHub’s **Development** sidebar on the **sub-issue** (not the parent release 
 
 ### Issue ↔ PR linking (required)
 
-**On every PR — first line only (always this format):**
+**On every PR to `develop` — first line (both issues):**
 
 ```text
-Resolves bmsandoval/covered#<issue-number>
+Resolves bmsandoval/covered#<sub-issue-number>, resolves bmsandoval/covered#<parent-issue-number>
 ```
 
-Example: `Resolves bmsandoval/covered#3`
+Example (sub-issue #3, parent release #2):
 
-Use the **full `owner/repo#issue` form** every time (not `#3` alone) so the link is obvious in the PR list and on GitHub.
+```text
+Resolves bmsandoval/covered#3, resolves bmsandoval/covered#2
+```
 
-Then add Summary, Changes, Test plan, and an **Issue** link (see template below). **Backlink:** comment on the issue with the PR URL when the PR opens or updates.
+- **Sub-issue** — the slice you implemented (branch `issue-<sub>-…`, Development link on sub-issue).
+- **Parent** — the release milestone; closes on squash-merge to `develop` because that work was tested and accepted into integration.
 
-`Resolves` is a GitHub built-in keyword — the sub-issue should appear under **Development** and auto-close when the PR is squash-merged to `develop` (default branch).
+Use the **full `owner/repo#issue` form** every time. Then Summary, Changes, Test plan, and links to both issues (see template). **Backlink:** comment on the **sub-issue** with the PR URL.
+
+**Hotfix PRs** (into `release-*`, not `develop`): `Resolves` only the **bug-fix sub-issue** unless maintainer says otherwise.
 
 **Verify** (optional):
 
 ```bash
-gh api graphql -f query='query { repository(owner:"Bmsandoval",name:"covered") { issue(number:N) { closedByPullRequestsReferences(first:5) { nodes { number } } } } }'
+gh api graphql -f query='query { repository(owner:"Bmsandoval",name:"covered") { parent: issue(number:2) { closedByPullRequestsReferences(first:5) { nodes { number } } } sub: issue(number:3) { closedByPullRequestsReferences(first:5) { nodes { number } } } } }'
 ```
 
-**On every completed release:**
+**On every completed release (after all subs merged to `develop`):**
 
-- Add the **release tag** (e.g. `v0.2.0`) to the **parent release issue** Links section.
-- Close the **parent** when all sub-issues are closed and acceptance criteria for the minor version are met.
-- Sub-issues already closed via their own PRs; do not re-close them at release time.
+- Add the **release tag** (e.g. `v0.2.0`) to the **parent** Links section.
+- Parent should already be closed by the last squash-merge PR; if not, close manually.
 
 ### Pull request description format
 
@@ -400,19 +406,24 @@ This project may be built with LLM assistance; that is fine. **Do not advertise 
 
 **Never add** lines such as:
 
-- “Made with Cursor” / “Generated by Cursor”
+- “Made with Cursor” / “Generated by Cursor” / `Made with [Cursor](https://cursor.com)`
 - “Co-authored-by” trailers or badges for Cursor, Copilot, Claude, ChatGPT, etc.
 - “AI-assisted”, “written by AI”, or similar disclaimers in PR descriptions, issue bodies, or release notes
 - Footer boilerplate promoting any coding agent or IDE
 
-Write issues and PRs as **normal engineering artifacts**: problem, approach, changes, test plan — nothing about which tool drafted the text.
+**GitHub may append a Cursor footer when PRs are created from the IDE.** After `gh pr create` or before merge, **read the PR body and remove** any Cursor line. Use:
 
-If the user or maintainer wants to mention tooling elsewhere (e.g. personal blog), that is their call — **not** in this repo’s GitHub surface by default.
+```bash
+gh pr view <number> --json body --jq .body   # inspect
+gh pr edit <number> --body-file pr-body.md   # fix and save without footer
+```
+
+Write issues and PRs as **normal engineering artifacts**: problem, approach, changes, test plan — nothing about which tool drafted the text.
 
 **PR body skeleton:**
 
 ```markdown
-Resolves bmsandoval/covered#N
+Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>
 
 ## Summary
 
@@ -429,9 +440,10 @@ Resolves bmsandoval/covered#N
 
 - [ ] ...
 
-## Issue
+## Issues
 
-- https://github.com/Bmsandoval/covered/issues/N
+- Sub-issue: https://github.com/Bmsandoval/covered/issues/<sub>
+- Parent release: https://github.com/Bmsandoval/covered/issues/<parent>
 ```
 
 ### GitHub issue format
@@ -456,7 +468,8 @@ Before opening a PR:
 - [ ] Branch appears under the sub-issue **Development** section (via `gh issue develop` or manual link)
 - [ ] Changes map only to that issue
 - [ ] PR targets `develop`
-- [ ] First line is exactly `Resolves bmsandoval/covered#<N>`, then Summary / Changes / Test plan / Issue URL
+- [ ] First line resolves **sub-issue and parent**: `Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>`
+- [ ] PR body has **no** Cursor / “Made with” footer (`gh pr view` to verify)
 - [ ] PR has same **milestone** as sub-issue and matching **labels** (`gh pr edit …`)
 - [ ] Issue commented with PR link
 

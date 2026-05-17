@@ -81,8 +81,9 @@ flowchart TB
 - Create the **parent first**, then sub-issues; link sub-issues to the parent using GitHub **sub-issues**.
 - Agents implement **sub-issues only** — one sub-issue per branch/PR.
 - **Link every working branch** on the sub-issue (**Development** sidebar).
-- PRs use **`Resolves bmsandoval/covered#N`** on the **sub-issue**; **squash merge** into `develop`.
-- Close the **parent** after: all sub-issues closed, test on `develop`, `release-X-Y-Z` cut, tag pushed, tag on parent.
+- PRs to `develop` **squash merge** with `Resolves` for **sub-issue and parent** (work is tested when it lands on `develop`).
+- **Bug fixes** during testing → **new sub-issue** under the parent (never drive-by on another branch).
+- After all subs on `develop`: cut `release-X-Y-Z`, tag, record tag on parent.
 
 ### Labels and milestones (required)
 
@@ -120,9 +121,15 @@ gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --check
 
 **Branch already on remote without link:** sub-issue → **Development** → **Link a branch** → `issue-<N>-<slug>`. Do not use GraphQL `createLinkedBranch` (wrong branch name).
 
-**PR first line (required):** `Resolves bmsandoval/covered#N` — always the full `owner/repo#issue` form. GitHub links this in **Development** and auto-closes the sub-issue on squash-merge to `develop`.
+**PR first line (required):**
 
-**Parent release issues** do not show branches — link work on **sub-issues** only.
+```text
+Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>
+```
+
+Squash-merge to `develop` closes **both** — sub-issue (slice done) and parent release (tested on integration). Link branch/PR on the **sub-issue** Development panel.
+
+**Parent release issues** do not get feature branches — only **sub-issues** do.
 
 ---
 
@@ -212,7 +219,7 @@ Part of **Release v0.1.0** — #<parent>
 **Merge:** **Squash** (features and hotfixes); **regular merge** for backmerge PRs only.
 
 ```markdown
-Resolves bmsandoval/covered#N
+Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>
 
 ## Summary
 
@@ -228,16 +235,17 @@ Resolves bmsandoval/covered#N
 
 - [ ] …
 
-## Issue
+## Issues
 
-- https://github.com/Bmsandoval/covered/issues/N
+- Sub-issue: https://github.com/Bmsandoval/covered/issues/<sub>
+- Parent release: https://github.com/Bmsandoval/covered/issues/<parent>
 ```
 
 ---
 
 ## No tool branding
 
-Do **not** include “Made with Cursor”, “AI-generated”, or similar in issues, PRs, commits, or release notes. See [AGENTS.md](../../AGENTS.md).
+Do **not** include “Made with Cursor”, “AI-generated”, or similar in issues, PRs, commits, or release notes. **Remove** any Cursor footer GitHub appends before merge. See [AGENTS.md](../../AGENTS.md).
 
 ---
 
@@ -258,7 +266,9 @@ Do **not** include “Made with Cursor”, “AI-generated”, or similar in iss
 
 - [ ] Base: **`develop`**
 - [ ] Merge method: **squash**
-- [ ] First line `Resolves bmsandoval/covered#N`, issue URL, backlink comment; PR under **Development**
+- [ ] First line: `Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>`
+- [ ] No Cursor / “Made with” footer in PR body
+- [ ] Backlink on sub-issue; PR under **Development**
 - [ ] Milestone and labels on PR
 
 **When releasing**
@@ -266,7 +276,7 @@ Do **not** include “Made with Cursor”, “AI-generated”, or similar in iss
 - [ ] All sub-issues squash-merged to `develop`
 - [ ] Test on `develop`
 - [ ] Cut `release-X-Y-Z` from `develop`
-- [ ] Tag on release branch; note on parent; close parent
+- [ ] Tag on release branch; note on parent (parent already closed by last squash-merge PR)
 
 **When hotfixing a release**
 

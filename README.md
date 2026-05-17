@@ -102,9 +102,10 @@ There is **no `main` / `master`**.
 
 1. Each minor version has a **parent release issue** (milestone `v0.x.0`) and **sub-issues** for the parts — implement **one sub-issue** at a time.
 2. Before the first commit: `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (links branch on the issue).
-3. PR to `develop`, title `Issue-<N> - <description>`, first line **`Resolves bmsandoval/covered#N`** — **squash merge**.
-4. Test on `develop`; cut `release-0-1-0` from `develop`; tag on the release branch (e.g. `v0.1.0`).
-5. Hotfixes: branch from `release-*` → squash to release → **regular merge** back to `develop`.
+3. PR to `develop`, title `Issue-<sub> - <description>`, first line **`Resolves bmsandoval/covered#<sub>, resolves bmsandoval/covered#<parent>`** — **squash merge** (closes sub-issue + parent when tested).
+4. Bug fixes → **new sub-issue** under the parent, not bundled into another PR.
+5. Test on `develop`; cut `release-0-1-0` from `develop`; tag on the release branch (e.g. `v0.1.0`).
+6. Hotfixes: branch from `release-*` → squash to release → **regular merge** back to `develop`.
 
 Full rules (labels, milestones, no tool branding, env files): [AGENTS.md](./AGENTS.md) · Templates: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).
 
