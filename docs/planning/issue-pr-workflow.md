@@ -81,7 +81,7 @@ flowchart TB
 - Create the **parent first**, then sub-issues; link sub-issues to the parent using GitHub **sub-issues**.
 - Agents implement **sub-issues only** — one sub-issue per branch/PR.
 - **Link every working branch** on the sub-issue (**Development** sidebar).
-- PRs **implement** the **sub-issue** (`Implements` line in body); **squash merge** into `develop`.
+- PRs use **`Resolves bmsandoval/covered#N`** on the **sub-issue**; **squash merge** into `develop`.
 - Close the **parent** after: all sub-issues closed, test on `develop`, `release-X-Y-Z` cut, tag pushed, tag on parent.
 
 ### Labels and milestones (required)
@@ -120,7 +120,7 @@ gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --check
 
 **Branch already on remote without link:** sub-issue → **Development** → **Link a branch** → `issue-<N>-<slug>`. Do not use GraphQL `createLinkedBranch` (wrong branch name).
 
-**PR must start with** `Implements https://github.com/Bmsandoval/covered/issues/N`. Link the PR on the sub-issue **Development** panel if it does not appear automatically (GitHub does not treat `Implements` as a closing keyword).
+**PR first line (required):** `Resolves bmsandoval/covered#N` — always the full `owner/repo#issue` form. GitHub links this in **Development** and auto-closes the sub-issue on squash-merge to `develop`.
 
 **Parent release issues** do not show branches — link work on **sub-issues** only.
 
@@ -212,7 +212,7 @@ Part of **Release v0.1.0** — #<parent>
 **Merge:** **Squash** (features and hotfixes); **regular merge** for backmerge PRs only.
 
 ```markdown
-Implements https://github.com/Bmsandoval/covered/issues/N
+Resolves bmsandoval/covered#N
 
 ## Summary
 
@@ -258,7 +258,7 @@ Do **not** include “Made with Cursor”, “AI-generated”, or similar in iss
 
 - [ ] Base: **`develop`**
 - [ ] Merge method: **squash**
-- [ ] `Implements` line, issue URL, backlink comment; PR linked under **Development**
+- [ ] First line `Resolves bmsandoval/covered#N`, issue URL, backlink comment; PR under **Development**
 - [ ] Milestone and labels on PR
 
 **When releasing**

@@ -102,7 +102,7 @@ There is **no `main` / `master`**.
 
 1. Each minor version has a **parent release issue** (milestone `v0.x.0`) and **sub-issues** for the parts — implement **one sub-issue** at a time.
 2. Before the first commit: `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (links branch on the issue).
-3. PR to `develop`, title `Issue-<N> - <description>`, first line `Implements https://github.com/Bmsandoval/covered/issues/N` — **squash merge**.
+3. PR to `develop`, title `Issue-<N> - <description>`, first line **`Resolves bmsandoval/covered#N`** — **squash merge**.
 4. Test on `develop`; cut `release-0-1-0` from `develop`; tag on the release branch (e.g. `v0.1.0`).
 5. Hotfixes: branch from `release-*` → squash to release → **regular merge** back to `develop`.
 

@@ -234,7 +234,7 @@ Each **minor version** (e.g. `v0.1.0`) gets one **top-level parent issue**. All 
 1. Create the **parent issue** first (title e.g. `Release v0.1.0 — Insurance MVP`).
 2. Create **sub-issues** for each part; attach them as **sub-issues** of the parent in GitHub.
 3. Prioritize and implement **sub-issues only** — one at a time.
-4. PRs **implement** the **sub-issue** (see **Implements** line in PR body), not the parent (unless the PR is explicitly release-wide).
+4. PRs use **`Resolves bmsandoval/covered#N`** on the **sub-issue**, not the parent (unless the PR is explicitly release-wide).
 5. When all sub-issues are done, we test on `develop`, **cut a release branch** from `develop`, tag on that branch (e.g. `v0.1.0`), record the tag on the **parent**, then **close the parent**.
 
 Do not file flat issues for release work without a parent when that work belongs to a planned minor version.
@@ -356,17 +356,25 @@ GitHub’s **Development** sidebar on the **sub-issue** (not the parent release 
 
 ### Issue ↔ PR linking (required)
 
-**On every PR:**
+**On every PR — first line only (always this format):**
 
-1. First line of the PR body — **Implements** (one reference only):
-   - `Implements https://github.com/Bmsandoval/covered/issues/N`
-   - Short form in checklists: `Implements #N` means the same issue.
-2. Add the issue URL again under **Issue** (see template below).
-3. **Backlink:** comment on the issue with the PR URL when the PR is opened or updated.
+```text
+Resolves bmsandoval/covered#<issue-number>
+```
 
-Do **not** duplicate with `Closes`, `Fixes`, or `Resolves` — we use **Implements** as our single convention.
+Example: `Resolves bmsandoval/covered#3`
 
-**GitHub note:** `Implements` is not a built-in GitHub closing keyword. After opening the PR, ensure it appears on the sub-issue **Development** panel (**Development → Link pull request** if needed). On squash-merge, **close the sub-issue** if GitHub did not auto-close it.
+Use the **full `owner/repo#issue` form** every time (not `#3` alone) so the link is obvious in the PR list and on GitHub.
+
+Then add Summary, Changes, Test plan, and an **Issue** link (see template below). **Backlink:** comment on the issue with the PR URL when the PR opens or updates.
+
+`Resolves` is a GitHub built-in keyword — the sub-issue should appear under **Development** and auto-close when the PR is squash-merged to `develop` (default branch).
+
+**Verify** (optional):
+
+```bash
+gh api graphql -f query='query { repository(owner:"Bmsandoval",name:"covered") { issue(number:N) { closedByPullRequestsReferences(first:5) { nodes { number } } } } }'
+```
 
 **On every completed release:**
 
@@ -404,7 +412,7 @@ If the user or maintainer wants to mention tooling elsewhere (e.g. personal blog
 **PR body skeleton:**
 
 ```markdown
-Implements https://github.com/Bmsandoval/covered/issues/N
+Resolves bmsandoval/covered#N
 
 ## Summary
 
@@ -448,7 +456,7 @@ Before opening a PR:
 - [ ] Branch appears under the sub-issue **Development** section (via `gh issue develop` or manual link)
 - [ ] Changes map only to that issue
 - [ ] PR targets `develop`
-- [ ] PR body starts with `Implements https://github.com/Bmsandoval/covered/issues/N`, then Summary / Changes / Test plan / Issue URL
+- [ ] First line is exactly `Resolves bmsandoval/covered#<N>`, then Summary / Changes / Test plan / Issue URL
 - [ ] PR has same **milestone** as sub-issue and matching **labels** (`gh pr edit …`)
 - [ ] Issue commented with PR link
 
