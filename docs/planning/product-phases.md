@@ -18,6 +18,8 @@ How **prototype**, **MVP**, and **platform** relate. GitHub **milestones** (`v0.
 
 **Stack (agreed):** **Go** for application code (API and services).
 
+**Infrastructure (agreed):** **Local-first** — SQLite, in-memory cache, local file uploads; **ports + dependency injection** so MySQL, Redis, and object storage can be swapped later. See [local-first-architecture.md](./local-first-architecture.md).
+
 **Auth (agreed):** **Anonymous sessions** — browser/session cookie, no user accounts, no OAuth in prototype. Isolate data by session id server-side.
 
 **Delivery:** **Option B — thin releases** (one user-visible slice per minor version):

@@ -90,6 +90,23 @@ When implementing prototype features, prefer **reusable building blocks** (`Docu
 
 Do not add OAuth, signup, or multi-tenant accounts unless a **non-prototype** issue explicitly says so.
 
+## Local-first architecture (required for Go code)
+
+Prototype infrastructure stays **on the developer machine** (`./data/`, SQLite, in-memory cache, local uploads). Implement **ports + adapters** with **constructor injection** so we can swap SQLite → MySQL, memory → Redis, local disk → object storage, and mock LLM chat **without rewriting services**.
+
+| Rule | Detail |
+|------|--------|
+| **Interfaces in `internal/ports`** | DB, cache, blob store, sessions, `ChatCompleter`, parsers — not in handlers |
+| **Services in `internal/app`** | Orchestration only; depend on ports |
+| **Adapters in `internal/adapters`** | `sqlite`, `memory`, `localfs`, `llm`, etc. |
+| **Wire in `cmd/covered/main`** | Read `DATABASE_DRIVER`, `CACHE_BACKEND`, `STORAGE_BACKEND` from env |
+| **SQL** | Portable migrations; repository pattern — no raw SQL in HTTP layer |
+| **Chat** | Request/response types on `ChatCompleter` port; HTTP maps JSON ↔ domain |
+
+Full guide: [`docs/planning/local-first-architecture.md`](./docs/planning/local-first-architecture.md).
+
+Do not import Redis, MySQL, or cloud SDKs into `app` or `api` packages. Default `go test ./...` must not call live LLM APIs (use fakes).
+
 ## Product goal (prototype demo narrative)
 
 **“Ask My Insurance Plan”** — Users upload or enter insurance information, then ask questions such as:

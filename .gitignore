@@ -28,6 +28,9 @@ go.work.sum
 *.env
 !ex.env
 
+# Local prototype data (sqlite, uploads, cache spill)
+/data/
+
 # Editor/IDE
 # .idea/
 # .vscode/
