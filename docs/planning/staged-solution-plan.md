@@ -135,11 +135,12 @@ Map stages to **thin minor versions** — one parent issue per row:
 
 **Deliverables**
 
-- Application skeleton (API + optional web shell)
-- Load config from `local.env` / `ex.env`
+- Application skeleton (API + optional web shell) — **Go**, wired via **dependency injection**
+- Port interfaces (`ports/`) and local adapters: **SQLite**, **memory cache**, **local blob store** — see [local-first-architecture.md](./local-first-architecture.md)
+- Load config from `local.env` / `ex.env` (`DATABASE_DRIVER`, `CACHE_BACKEND`, `STORAGE_BACKEND`)
 - `develop` + release-branch workflow documented and used (no `main`/`master`)
 - Health check or “hello” endpoint
-- Basic CI (lint/test) when code exists
+- Basic CI (lint/test) when code exists; unit tests use **fake ports**, no live LLM in CI
 
 **Success criteria**
 
@@ -370,10 +371,12 @@ Suggested first batch — sub-issues under parent **`v0.1.0` (Prototype: documen
 
 | Priority | Issue theme | Stage |
 |----------|-------------|-------|
-| P0 | Go project skeleton + env loading + health check | 0 |
-| P0 | Anonymous session middleware + session-scoped data | 0 |
-| P0 | Upload API + storage + DocumentSource interface | 1 |
-| P0 | PDF text extraction + chunking | 1 |
+| P0 | Go skeleton + config + DI wiring in `main` | 0 |
+| P0 | Port interfaces + fakes for tests (`ports/`) | 0 |
+| P0 | SQLite migrations + repositories (portable SQL) | 0–1 |
+| P0 | Anonymous session port + middleware | 0 |
+| P0 | Local `BlobStore` + upload API | 1 |
+| P0 | PDF adapter + chunk repository | 1 |
 | P1 | Image OCR + chunking | 1 |
 | P1 | Insurance field extraction + provenance | 2 |
 | P1 | Retrieval + citation answer API | 3 |

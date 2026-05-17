@@ -112,7 +112,7 @@ cp ex.env local.env
 | **v0.0.0** | Shipped — planning, workflow, `AGENTS.md` ([tag](https://github.com/Bmsandoval/covered/releases/tag/v0.0.0)) |
 | **v0.1.0** | Next — **Prototype: document upload** (Go skeleton + PDF → chunks) |
 
-**Stack:** Go · anonymous sessions (prototype).
+**Stack:** Go · anonymous sessions · **local-first** (SQLite, in-memory cache, `./data/uploads`) with swappable ports — see [local-first architecture](docs/planning/local-first-architecture.md).
 
 ## GitHub About line
 

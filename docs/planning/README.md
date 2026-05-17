@@ -9,5 +9,6 @@ LLM- and agent-generated planning artifacts for Covered live here (architecture 
 | [staged-solution-plan.md](./staged-solution-plan.md) | Technical stages 0–9 and thin-release map |
 | [issue-pr-workflow.md](./issue-pr-workflow.md) | GitHub issue/PR templates |
 | [connectors-and-storage.md](./connectors-and-storage.md) | Drive read-through, opt-in vault (post-prototype) |
+| [local-first-architecture.md](./local-first-architecture.md) | Go ports/adapters, local SQLite/cache/files, swappable later |
 
 Do not put planning drafts in the repo root or next to application code. User-facing product docs belong in `README.md` or future `docs/` guides outside this folder.
