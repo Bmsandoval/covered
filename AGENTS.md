@@ -241,6 +241,38 @@ Do not file flat issues for release work without a parent when that work belongs
 
 Templates: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md) — **Release parent issue** and **Sub-issue**.
 
+### Labels and milestones (required)
+
+Every **parent**, **sub-issue**, and **PR** for a release must have:
+
+| Item | Milestone | Labels |
+|------|-----------|--------|
+| **Parent release issue** | Minor version (e.g. `v0.0.0`) | `release` |
+| **Sub-issue** | Same milestone as parent | Type + stage (e.g. `documentation`, `planning`, `stage:0`) |
+| **Pull request** | Same milestone as the sub-issue it closes | Same type labels as sub-issue (omit `stage:*` on PR if you prefer) |
+
+**Milestone = minor version** — create one per release (`v0.0.0`, `v0.1.0`, …) before filing issues.
+
+**`gh` examples:**
+
+```bash
+# Create milestone (once per minor version)
+gh api repos/Bmsandoval/covered/milestones -f title="v0.1.0" -f description="Insurance MVP — …"
+
+# Parent issue
+gh issue create --title "Release v0.1.0 — …" --milestone "v0.1.0" --label "release"
+
+# Sub-issue
+gh issue create --title "…" --milestone "v0.1.0" --label "enhancement,stage:1"
+
+# PR (after open)
+gh pr edit <number> --milestone "v0.1.0" --add-label "enhancement"
+```
+
+**Stage labels:** `stage:0` (foundation), `stage:1` (document core), `stage:2` (insurance), etc. — see [staged-solution-plan.md](./docs/planning/staged-solution-plan.md).
+
+**Type labels:** use existing repo labels (`documentation`, `enhancement`, `planning`, `bug`, …). Add new labels only when needed.
+
 ### One issue at a time
 
 - Work **exactly one sub-issue** per branch and PR — no drive-by fixes or bundled unrelated work.
@@ -264,14 +296,14 @@ Templates: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workf
 
 GitHub’s issue **Development** sidebar must show the working branch (and then the PR). **Every sub-issue** you implement must have its branch linked there.
 
-**Preferred — create a linked branch (maintainer machine with `gh auth login`):**
+**Preferred — create a linked branch with `gh` (use before first commit):**
 
 ```bash
 git checkout develop && git pull
 gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --checkout --base develop
 ```
 
-This creates the branch **already linked** to the issue.
+This creates the branch **already linked** in **Development**. Do **not** use `createLinkedBranch` GraphQL on an existing branch — it may create a duplicate auto-named branch. Always pass `--name issue-<N>-<slug>` to match our convention.
 
 **If the branch already exists locally and was pushed:**
 
@@ -362,8 +394,9 @@ When creating or drafting issues, use the structure in `docs/planning/issue-pr-w
 Before coding:
 
 - [ ] Confirm the active **sub-issue** number and that it is the current priority
+- [ ] Sub-issue has correct **milestone** (minor version) and **labels**
 - [ ] Note the **parent release issue** for context (do not implement the whole parent in one PR)
-- [ ] Branch from latest `develop`: `issue-<number>-<very-short-description>` (e.g. `issue-12-pdf-upload`)
+- [ ] Create linked branch: `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop`
 - [ ] PR title: `Issue-<number> - <slightly longer description>` (e.g. `Issue-12 - Add PDF upload endpoint`)
 
 Before opening a PR:
@@ -372,6 +405,7 @@ Before opening a PR:
 - [ ] Changes map only to that issue
 - [ ] PR targets `develop`
 - [ ] PR body follows the format above with `Closes #N` and issue URL
+- [ ] PR has same **milestone** as sub-issue and matching **labels** (`gh pr edit …`)
 - [ ] Issue commented with PR link
 
 Before considering work “released”:

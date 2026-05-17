@@ -65,7 +65,29 @@ gh issue develop <issue-number> --name issue-<issue-number>-<short-slug> --check
 
 **Verify:** Issue sidebar **Development** lists the branch; after PR open, the PR should appear (branch may be folded into PR — OK).
 
-**Labels (suggested):** parent — `release`, `v0.1.0`; sub-issues — `stage:1`, etc. if useful.
+### Labels and milestones (required)
+
+| Item | Milestone | Labels |
+|------|-----------|--------|
+| Parent release issue | Minor version (`v0.0.0`, `v0.1.0`, …) | `release` |
+| Sub-issue | Same as parent | e.g. `documentation`, `planning`, `enhancement`, `stage:0` |
+| Pull request | Same as sub-issue | Match sub-issue type labels |
+
+Create the **milestone first** (one per minor version):
+
+```bash
+gh api repos/Bmsandoval/covered/milestones -f title="v0.1.0" -f description="…"
+```
+
+Apply when creating or after filing:
+
+```bash
+gh issue edit <parent> --milestone "v0.0.0" --add-label "release"
+gh issue edit <sub> --milestone "v0.0.0" --add-label "documentation,planning,stage:0"
+gh pr edit <pr> --milestone "v0.0.0" --add-label "documentation,planning"
+```
+
+**Stage labels:** `stage:0` … `stage:9` aligned with [staged-solution-plan.md](./staged-solution-plan.md).
 
 ---
 
@@ -260,8 +282,9 @@ Do **not** include “Made with Cursor”, “AI-generated”, Copilot/Claude co
 
 **When creating a minor version**
 
-- [ ] Parent release issue created with target tag (e.g. `v0.1.0`)
-- [ ] Sub-issues created and attached to parent in GitHub
+- [ ] Milestone created for minor version (e.g. `v0.1.0`)
+- [ ] Parent release issue created with target tag (e.g. `v0.1.0`), milestone, label `release`
+- [ ] Sub-issues created and attached to parent in GitHub; same milestone + labels
 - [ ] Parent body lists all sub-issue numbers
 
 **When starting work (sub-issue)**
@@ -275,6 +298,7 @@ Do **not** include “Made with Cursor”, “AI-generated”, Copilot/Claude co
 - [ ] Body includes full sub-issue URL under **Issue**
 - [ ] Comment on **sub-issue** with PR link (backlink)
 - [ ] PR appears under **Development** on the sub-issue
+- [ ] PR has same **milestone** and **labels** as sub-issue (`gh pr edit …`)
 - [ ] Optional: comment on **parent** with progress note when a major sub-issue merges
 
 **When releasing**
