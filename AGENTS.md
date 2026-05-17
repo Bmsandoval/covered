@@ -409,6 +409,7 @@ If the user or maintainer wants to mention tooling elsewhere (e.g. personal blog
 
 ```markdown
 Closes #N
+Fixes https://github.com/Bmsandoval/covered/issues/N
 
 ## Summary
 
@@ -452,7 +453,7 @@ Before opening a PR:
 - [ ] Branch appears under the sub-issue **Development** section (via `gh issue develop` or manual link)
 - [ ] Changes map only to that issue
 - [ ] PR targets `develop`
-- [ ] PR body follows the format above with `Closes #N` and issue URL
+- [ ] PR body starts with `Closes #N` and `Fixes https://github.com/Bmsandoval/covered/issues/N`, then Summary / Changes / Test plan / Issue URL
 - [ ] PR has same **milestone** as sub-issue and matching **labels** (`gh pr edit …`)
 - [ ] Issue commented with PR link
 

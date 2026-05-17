@@ -89,25 +89,24 @@ flowchart LR
 
 ## Development
 
-We build in small, reviewable slices tied to GitHub issues.
+We build in small, reviewable slices tied to **GitHub issues** (planning docs in [`docs/planning/`](./docs/planning/) inform strategy; **issues are the work queue**).
 
 | Branch | Purpose |
 |--------|---------|
-| [`develop`](https://github.com/Bmsandoval/covered/tree/develop) | Integration — sub-issue PRs **squash-merge** here |
-| `release-X-Y-Z` (e.g. `release-0-0-0`) | Cut from `develop` per minor; hotfixes squash here, then **backmerge** to `develop` |
+| [`develop`](https://github.com/Bmsandoval/covered/tree/develop) | Integration — feature PRs **squash-merge** here |
+| `release-X-Y-Z` (e.g. `release-0-0-0`) | Cut from `develop` per minor version; hotfixes land here, then **backmerge** to `develop` |
 
 There is **no `main` / `master`**.
 
 **Workflow (short):**
 
-1. Each minor version has a **parent release issue** with **sub-issues**; work **one sub-issue** at a time.
-2. Branch from `develop` → PR to `develop` → **squash merge**.
-3. Link the issue on the PR (`Closes #N`) and **comment the PR link on the issue**.
-4. Test on `develop`; cut **`release-0-1-0`** (etc.) from `develop`; **tag** on the release branch (e.g. `v0.1.0`).
+1. Each minor version has a **parent release issue** (milestone `v0.x.0`) and **sub-issues** for the parts — implement **one sub-issue** at a time.
+2. Before the first commit: `gh issue develop <N> --name issue-<N>-<slug> --checkout --base develop` (links branch on the issue).
+3. PR to `develop`, title `Issue-<N> - <description>`, body starts with `Closes #N` and `Fixes https://github.com/Bmsandoval/covered/issues/N` — **squash merge**.
+4. Test on `develop`; cut `release-0-1-0` from `develop`; tag on the release branch (e.g. `v0.1.0`).
 5. Hotfixes: branch from `release-*` → squash to release → **regular merge** back to `develop`.
 
-Templates and examples: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).  
-Agent and contributor rules: [AGENTS.md](./AGENTS.md).
+Full rules (labels, milestones, no tool branding, env files): [AGENTS.md](./AGENTS.md) · Templates: [`docs/planning/issue-pr-workflow.md`](./docs/planning/issue-pr-workflow.md).
 
 **Local setup:**
 
