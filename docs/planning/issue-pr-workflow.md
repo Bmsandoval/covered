@@ -2,6 +2,8 @@
 
 Canonical templates for GitHub issues and pull requests. Agents must follow [AGENTS.md](../../AGENTS.md) **Agent operating model** (planning first, create/manage issues) and **Development workflow**; this doc is the detailed template reference.
 
+**Maintainer gates:** agents **open PRs and ask for review** — they **do not merge** or **cut releases** unless the maintainer explicitly says so.
+
 ## Branching and releases
 
 **No `main` or `master`.** Only **`develop`** and **`release-*`** branches.
@@ -352,11 +354,17 @@ Do **not** include “Made with Cursor”, “AI-generated”, or similar in iss
 **When opening a PR (sub-issue)**
 
 - [ ] Base: **`develop`**
-- [ ] Merge method: **squash**
+- [ ] Merge method: **squash** (when maintainer merges)
 - [ ] First line: `- Resolves bmsandoval/covered#<sub>`
 - [ ] No Cursor / “Made with” footer in PR body
 - [ ] Backlink on sub-issue; PR under **Development**
 - [ ] Milestone and labels on PR
+- [ ] **Tell maintainer PR is ready; ask for review — do not `gh pr merge`**
+
+**When releasing (maintainer only — agent may recommend, not execute)**
+
+- [ ] Maintainer explicitly approved cut/tag
+- [ ] Correct version: patch `v0.0.x` vs minor `v0.x.0`
 
 **When releasing**
 
